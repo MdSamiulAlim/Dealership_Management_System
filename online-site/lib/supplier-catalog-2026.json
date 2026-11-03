@@ -1,0 +1,574 @@
+{
+  "revision": "akij-images-2026-10-22-v1",
+  "source_dates": {
+    "Poultry feed": "2026-04-04",
+    "Cattle feed": "2026-04-04",
+    "Fish feed": "2026-09-24"
+  },
+  "products": [
+    {
+      "category": "Poultry feed",
+      "code": "101",
+      "item": "Broiler Starter",
+      "name": "Broiler Starter 50 KG",
+      "feed_size": "Crumble",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": [
+        "BROILER STARTER FEED 50 KG"
+      ]
+    },
+    {
+      "category": "Poultry feed",
+      "code": "102",
+      "item": "Broiler Grower",
+      "name": "Broiler Grower 50 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": [
+        "BROILER GROWER FEED 50 KG"
+      ]
+    },
+    {
+      "category": "Poultry feed",
+      "code": "103",
+      "item": "Broiler Finisher",
+      "name": "Broiler Finisher 50 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": [
+        "BROILER FINISHER FEED 50 KG"
+      ]
+    },
+    {
+      "category": "Poultry feed",
+      "code": "201",
+      "item": "Layer Starter",
+      "name": "Layer Starter 50 KG",
+      "feed_size": "Crumble",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": [
+        "LAYER STARTER FEED 50 KG"
+      ]
+    },
+    {
+      "category": "Poultry feed",
+      "code": "202",
+      "item": "Layer Grower",
+      "name": "Layer Grower 50 KG",
+      "feed_size": "Crumble",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": []
+    },
+    {
+      "category": "Poultry feed",
+      "code": "203",
+      "item": "Pre-Layer",
+      "name": "Pre-Layer (Mash) 50 KG",
+      "feed_size": "Mash",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": []
+    },
+    {
+      "category": "Poultry feed",
+      "code": "208",
+      "item": "Pre-Layer",
+      "name": "Pre-Layer (Pellet) 50 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": []
+    },
+    {
+      "category": "Poultry feed",
+      "code": "204",
+      "item": "Layer Layer-1",
+      "name": "Layer Layer-1 (Mash) 50 KG",
+      "feed_size": "Mash",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": [
+        "Layer Layer- 1 50KG"
+      ]
+    },
+    {
+      "category": "Poultry feed",
+      "code": "205",
+      "item": "Layer Layer-1",
+      "name": "Layer Layer-1 (Pellet) 50 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": []
+    },
+    {
+      "category": "Poultry feed",
+      "code": "206",
+      "item": "Layer Layer-2",
+      "name": "Layer Layer-2 50 KG",
+      "feed_size": "Mash",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": [
+        "Layer Layer- 2 50KG"
+      ]
+    },
+    {
+      "category": "Poultry feed",
+      "code": "207",
+      "item": "Layer Concentrated 40",
+      "name": "Layer Concentrated 40 50 KG",
+      "feed_size": "Mash",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": []
+    },
+    {
+      "category": "Poultry feed",
+      "code": "301",
+      "item": "Sonali Starter",
+      "name": "Sonali Starter 50 KG",
+      "feed_size": "Crumble",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": []
+    },
+    {
+      "category": "Poultry feed",
+      "code": "302",
+      "item": "Sonali Grower",
+      "name": "Sonali Grower 50 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": [
+        "SONALI/COCK GROWER FEED 50 KG"
+      ]
+    },
+    {
+      "category": "Poultry feed",
+      "code": "901",
+      "item": "Color Bird Starter",
+      "name": "Color Bird Starter 50 KG",
+      "feed_size": "Crumble",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": []
+    },
+    {
+      "category": "Poultry feed",
+      "code": "902",
+      "item": "Color Bird Grower",
+      "name": "Color Bird Grower 50 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 50,
+      "aliases": []
+    },
+    {
+      "category": "Cattle feed",
+      "code": "402",
+      "item": "Milk Booster",
+      "name": "Milk Booster 25 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 25,
+      "aliases": [
+        "MILK BOOSTER CATTLE FEED 25 KG"
+      ]
+    },
+    {
+      "category": "Cattle feed",
+      "code": "403",
+      "item": "Beef Builder",
+      "name": "Beef Builder 25 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 25,
+      "aliases": [
+        "BEEF BUILDER CATTLE FEED 25 KG"
+      ]
+    },
+    {
+      "category": "Cattle feed",
+      "code": "404",
+      "item": "Dairy Regular",
+      "name": "Dairy Regular 25 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 25,
+      "aliases": [
+        "DAIRY CATTLE FEED 25 KG"
+      ]
+    },
+    {
+      "category": "Cattle feed",
+      "code": "405",
+      "item": "Beef Regular",
+      "name": "Beef Regular 25 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 25,
+      "aliases": [
+        "BEEF CATTLE FEED 25 KG"
+      ]
+    },
+    {
+      "category": "Cattle feed",
+      "code": "406",
+      "item": "Bhushi Mix",
+      "name": "Bhushi Mix 25 KG",
+      "feed_size": "Mash",
+      "protein_percent": null,
+      "pack_kg": 25,
+      "aliases": [
+        "CATTLE BHUSHI MIX FEED 25 KG"
+      ]
+    },
+    {
+      "category": "Cattle feed",
+      "code": "407",
+      "item": "Dairy Cattle",
+      "name": "Dairy Cattle 40 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 40,
+      "aliases": []
+    },
+    {
+      "category": "Cattle feed",
+      "code": "401",
+      "item": "Calf Starter",
+      "name": "Calf Starter 5 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 5,
+      "aliases": []
+    },
+    {
+      "category": "Cattle feed",
+      "code": "408",
+      "item": "Beef Grower Plus",
+      "name": "Beef Grower Plus 25 KG",
+      "feed_size": "Pellet",
+      "protein_percent": null,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "801",
+      "item": "Nursery (Pabda/Gulsha)",
+      "name": "Nursery (Pabda/Gulsha) 5 KG",
+      "feed_size": "Powder",
+      "protein_percent": 40,
+      "pack_kg": 5,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "802",
+      "item": "Nursery (Tilapia)",
+      "name": "Nursery (Tilapia) 10 KG",
+      "feed_size": "Powder",
+      "protein_percent": 35,
+      "pack_kg": 10,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "501",
+      "item": "Starter-1 (Pabda/Gulsha)",
+      "name": "Starter-1 (Pabda/Gulsha) 10 KG",
+      "feed_size": "0.6 mm",
+      "protein_percent": 40,
+      "pack_kg": 10,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "503",
+      "item": "Starter-2 (Pabda/Gulsha)",
+      "name": "Starter-2 (Pabda/Gulsha) 20 KG",
+      "feed_size": "1.0 mm",
+      "protein_percent": 40,
+      "pack_kg": 20,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "505",
+      "item": "Starter-3 (Pabda/Gulsha)",
+      "name": "Starter-3 (Pabda/Gulsha) 25 KG",
+      "feed_size": "1.2 mm",
+      "protein_percent": 37,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "506",
+      "item": "Grower (Pabda/Gulsha)",
+      "name": "Grower (Pabda/Gulsha) 25 KG",
+      "feed_size": "1.5 mm",
+      "protein_percent": 37,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "507",
+      "item": "Starter-2 Shing Magur",
+      "name": "Starter-2 Shing Magur 25 KG",
+      "feed_size": "1.5 mm",
+      "protein_percent": 35,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "541",
+      "item": "Koi Starter-3",
+      "name": "Koi Starter-3 Floating 25 KG",
+      "feed_size": "1.8 mm",
+      "protein_percent": 34,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "542",
+      "item": "Koi Grower",
+      "name": "Koi Grower Floating 25 KG",
+      "feed_size": "2.5 mm",
+      "protein_percent": 33,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "512",
+      "item": "Tilapia Starter (Premium)",
+      "name": "Tilapia Starter (Premium) Floating 25 KG",
+      "feed_size": "2 mm",
+      "protein_percent": 30,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "513",
+      "item": "Tilapia Grower (Premium)",
+      "name": "Tilapia Grower (Premium) Floating 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 28,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "514",
+      "item": "Tilapia Grower (Standard)",
+      "name": "Tilapia Grower (Standard) Floating 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 27,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "515",
+      "item": "Tilapia Finisher (Standard)",
+      "name": "Tilapia Finisher (Standard) Floating 25 KG",
+      "feed_size": "4 mm",
+      "protein_percent": 25,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "521",
+      "item": "Pangus Starter (Premium)",
+      "name": "Pangus Starter (Premium) Floating 25 KG",
+      "feed_size": "2 mm",
+      "protein_percent": 30,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "522",
+      "item": "Pangus Grower (Premium)",
+      "name": "Pangus Grower (Premium) Floating 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 28,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "523",
+      "item": "Pangus Finisher (Premium)",
+      "name": "Pangus Finisher (Premium) Floating 25 KG",
+      "feed_size": "5 mm",
+      "protein_percent": 26,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "525",
+      "item": "Pangus Grower (Standard)",
+      "name": "Pangus Grower (Standard) Floating 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 26,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "526",
+      "item": "Pangus Finisher (Standard)",
+      "name": "Pangus Finisher (Standard) Floating 25 KG",
+      "feed_size": "5 mm",
+      "protein_percent": 25,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "531",
+      "item": "Carp Starter",
+      "name": "Carp Starter Floating 25 KG",
+      "feed_size": "2 mm",
+      "protein_percent": 25,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "532",
+      "item": "Carp Grower Premium",
+      "name": "Carp Grower Premium Floating 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 24,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "534",
+      "item": "Carp Grower Standard",
+      "name": "Carp Grower Standard Floating 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 22,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "535",
+      "item": "Carp Poly Culture Grower",
+      "name": "Carp Poly Culture Grower Floating 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 22,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "536",
+      "item": "Carp Poly Culture Starter",
+      "name": "Carp Poly Culture Starter Floating 25 KG",
+      "feed_size": "2 mm",
+      "protein_percent": 24,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "537",
+      "item": "Carp Poly Culture Finisher",
+      "name": "Carp Poly Culture Finisher Floating 25 KG",
+      "feed_size": "4 mm",
+      "protein_percent": 21,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "601",
+      "item": "Pangus Starter-1 Sinking",
+      "name": "Pangus Starter-1 Sinking 25 KG",
+      "feed_size": "Crumble",
+      "protein_percent": 28,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "611",
+      "item": "Tilapia Starter-2 Sinking",
+      "name": "Tilapia Starter-2 Sinking 25 KG",
+      "feed_size": "2 mm",
+      "protein_percent": 28,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "612",
+      "item": "Talapia Grower Premium Sinking",
+      "name": "Talapia Grower Premium Sinking 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 27,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "614",
+      "item": "Pangus Grower (Standard) Sinking",
+      "name": "Pangus Grower (Standard) Sinking 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 26,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "615",
+      "item": "Pangus Finisher (Standard) Sinking",
+      "name": "Pangus Finisher (Standard) Sinking 25 KG",
+      "feed_size": "4 mm",
+      "protein_percent": 25,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "622",
+      "item": "Carp Grower (Premium) Sinking",
+      "name": "Carp Grower (Premium) Sinking 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 24,
+      "pack_kg": 25,
+      "aliases": []
+    },
+    {
+      "category": "Fish feed",
+      "code": "623",
+      "item": "Carp Grower (Standard) Sinking",
+      "name": "Carp Grower (Standard) Sinking 25 KG",
+      "feed_size": "3 mm",
+      "protein_percent": 22,
+      "pack_kg": 25,
+      "aliases": []
+    }
+  ]
+}

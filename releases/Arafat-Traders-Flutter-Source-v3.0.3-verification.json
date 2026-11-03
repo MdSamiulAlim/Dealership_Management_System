@@ -1,0 +1,14 @@
+{
+  "file": "Arafat-Traders-Flutter-Source-v3.0.3.zip",
+  "version": "3.0.3",
+  "version_code": 9,
+  "bytes": 5364552,
+  "sha256": "b6f4d11497ebf7a966ffa15999b8cbf7a6810dab761fb569bcee56618548981c",
+  "source_sha256": "5f9a5dda080b33c7a7529aa6e94df8485e80af967b15fed54989f68f2dec32d6",
+  "matches_apk_source": true,
+  "source_files": 120,
+  "clean_extract_analyzer": "No issues found",
+  "clean_extract_tests_passed": 125,
+  "private_signing_credentials_included": false,
+  "backend_source_included": false
+}

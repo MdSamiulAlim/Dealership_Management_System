@@ -1,0 +1,1 @@
+ALTER TABLE `sync_operations` ADD `customer_id` integer;

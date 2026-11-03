@@ -1,0 +1,72 @@
+{
+  "version": "3.0.0",
+  "version_code": 6,
+  "min_android_api": 24,
+  "package": "com.samiul.akijdealership",
+  "certificate_sha256": "b70b254f801f3b545d167384dc36177eee4d6c727cbbfc1c245b50b199ca4b7e",
+  "tests_passed": 62,
+  "analyzer": "No issues found",
+  "physical_device_tested": false,
+  "ios_built": false,
+  "artifacts": [
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.0-arm64.apk",
+      "bytes": 26236094,
+      "sha256": "e23d0517adec3f8e1588e0925b004db656b4a814bb842bf9233159ac8e26025b",
+      "abi": "arm64-v8a",
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": [
+        {
+          "path": "lib/arm64-v8a/libapp.so",
+          "load_segment_alignment": 65536
+        },
+        {
+          "path": "lib/arm64-v8a/libdartjni.so",
+          "load_segment_alignment": 16384
+        },
+        {
+          "path": "lib/arm64-v8a/libflutter.so",
+          "load_segment_alignment": 65536
+        }
+      ]
+    },
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.0-armv7.apk",
+      "bytes": 24278040,
+      "sha256": "106ed420c9abd2eb9dc8f292fe52c0db0fd090a5204b3ba1f725c561971c0bc1",
+      "abi": "armeabi-v7a",
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": []
+    },
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.0-x86_64.apk",
+      "bytes": 27793093,
+      "sha256": "bd6a46db6d84cfe092174e8b8c158e78bc3d05426dfa7f30c4273e52c58a9cf5",
+      "abi": "x86_64",
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": [
+        {
+          "path": "lib/x86_64/libapp.so",
+          "load_segment_alignment": 65536
+        },
+        {
+          "path": "lib/x86_64/libdartjni.so",
+          "load_segment_alignment": 16384
+        },
+        {
+          "path": "lib/x86_64/libflutter.so",
+          "load_segment_alignment": 65536
+        }
+      ]
+    }
+  ],
+  "source_digest": "622619f28d4308feceb6947445877cd9e3f7e21a8b6fafd6b212b85c211ea984",
+  "source_archive": {
+    "file": "Arafat-Traders-Flutter-Source-v3.0.0.zip",
+    "bytes": 5342553,
+    "sha256": "9d5455f28f40ab29e42a8e41a28228fef533f421be91dacfaf1f64111402de95",
+    "clean_extract_analysis": "No issues found",
+    "clean_extract_tests_passed": 62
+  },
+  "retired_root_android_removed": true
+}

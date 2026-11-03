@@ -1,0 +1,85 @@
+{
+  "version": "3.0.3",
+  "version_code": 9,
+  "package": "com.samiul.akijdealership",
+  "min_android_api": 24,
+  "certificate_sha256": "b70b254f801f3b545d167384dc36177eee4d6c727cbbfc1c245b50b199ca4b7e",
+  "physical_device_tested": false,
+  "artifacts": [
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.3-arm64.apk",
+      "abi": "arm64-v8a",
+      "bytes": 26236094,
+      "sha256": "010a3d227455e744d4a38997bccca9d8d72cbbf710061bee3469f879729af40a",
+      "signature_verified": true,
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": [
+        {
+          "path": "lib/arm64-v8a/libapp.so",
+          "minimum_load_alignment": 65536
+        },
+        {
+          "path": "lib/arm64-v8a/libdartjni.so",
+          "minimum_load_alignment": 16384
+        },
+        {
+          "path": "lib/arm64-v8a/libflutter.so",
+          "minimum_load_alignment": 65536
+        }
+      ]
+    },
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.3-armv7.apk",
+      "abi": "armeabi-v7a",
+      "bytes": 24310808,
+      "sha256": "0d88ed01e0751965445dde4035d54add5483e3923cf91f5146fc86280823ec09",
+      "signature_verified": true,
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": []
+    },
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.3-x86_64.apk",
+      "abi": "x86_64",
+      "bytes": 27793093,
+      "sha256": "52207d32665559bda5dd1ab483d862caf99c0dcd97e54d7b68355af3a3b1aa53",
+      "signature_verified": true,
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": [
+        {
+          "path": "lib/x86_64/libapp.so",
+          "minimum_load_alignment": 65536
+        },
+        {
+          "path": "lib/x86_64/libdartjni.so",
+          "minimum_load_alignment": 16384
+        },
+        {
+          "path": "lib/x86_64/libflutter.so",
+          "minimum_load_alignment": 65536
+        }
+      ]
+    }
+  ],
+  "source_sha256": "5f9a5dda080b33c7a7529aa6e94df8485e80af967b15fed54989f68f2dec32d6",
+  "pubspec_lock_sha256": "cffe12c4b17a3ba18cf9ba61ef2315cb3ef2a0569436d0602a4244969c55e624",
+  "analyzer": "No issues found",
+  "tests_passed": 125,
+  "source_archive": {
+    "file": "Arafat-Traders-Flutter-Source-v3.0.3.zip",
+    "version": "3.0.3",
+    "version_code": 9,
+    "bytes": 5364552,
+    "sha256": "b6f4d11497ebf7a966ffa15999b8cbf7a6810dab761fb569bcee56618548981c",
+    "source_sha256": "5f9a5dda080b33c7a7529aa6e94df8485e80af967b15fed54989f68f2dec32d6",
+    "matches_apk_source": true,
+    "source_files": 120,
+    "clean_extract_analyzer": "No issues found",
+    "clean_extract_tests_passed": 125,
+    "private_signing_credentials_included": false,
+    "backend_source_included": false
+  },
+  "reset_guard_present_in_compiled_apks": true,
+  "canonical_api_origin": "https://akij-dealership-sami.subscription-cellosc.chatgpt.site",
+  "canonical_origin_present_in_compiled_apks": true,
+  "old_api_origin_absent_in_compiled_apks": true
+}

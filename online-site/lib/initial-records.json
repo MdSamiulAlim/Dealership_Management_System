@@ -1,0 +1,619 @@
+{
+  "products": [
+    {
+      "id": 4,
+      "name": "Layer Layer- 2 50KG",
+      "bag_weight": 50.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "লেঃ লে-২"
+    },
+    {
+      "id": 5,
+      "name": "Layer Layer- 1 50KG",
+      "bag_weight": 50.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "লেঃ লে-১"
+    },
+    {
+      "id": 6,
+      "name": "LAYER STARTER FEED 50 KG",
+      "bag_weight": 50.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "লেঃ স্টা-১"
+    },
+    {
+      "id": 7,
+      "name": "SONALI/COCK GROWER FEED 50 KG",
+      "bag_weight": 50.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "সোঃ গো-২"
+    },
+    {
+      "id": 8,
+      "name": "BROILER FINISHER FEED 50 KG",
+      "bag_weight": 50.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "ব্রোঃ ফি-৩"
+    },
+    {
+      "id": 9,
+      "name": "BROILER GROWER FEED 50 KG",
+      "bag_weight": 50.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "102"
+    },
+    {
+      "id": 10,
+      "name": "BROILER STARTER FEED 50 KG",
+      "bag_weight": 50.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "ব্রোঃ স্টা-১"
+    },
+    {
+      "id": 11,
+      "name": "DAIRY CATTLE FEED 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "ডেইরি"
+    },
+    {
+      "id": 12,
+      "name": "CATTLE BHUSHI MIX FEED 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "ভূষি মিক্স"
+    },
+    {
+      "id": 13,
+      "name": "BEEF CATTLE FEED 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "বিফ"
+    },
+    {
+      "id": 14,
+      "name": "MILK BOOSTER CATTLE FEED 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "মিল্ক বুস্টার"
+    },
+    {
+      "id": 15,
+      "name": "BEEF BUILDER CATTLE FEED 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "বিফ বিল্ডার"
+    },
+    {
+      "id": 16,
+      "name": "Tilapia Grower (Premium) 25KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "তেলাপিয়া গ্রো"
+    },
+    {
+      "id": 17,
+      "name": "Carp Grower (Standard) 25KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "কার্প গ্রো"
+    },
+    {
+      "id": 18,
+      "name": "Pangas Grower 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "পাঙ্গাস গ্রো"
+    },
+    {
+      "id": 19,
+      "name": "Pangus Grower (Premium) 20KG",
+      "bag_weight": 20.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "পাঙ্গাস গ্রো"
+    },
+    {
+      "id": 20,
+      "name": "Koi / Sing/ Pabda/ Gulsha/ Tilapia/ Pangus/ Carp Nursery 10KG",
+      "bag_weight": 10.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "নার্সারি"
+    },
+    {
+      "id": 21,
+      "name": "Koi / Sing/ Pabda / Gulsha / Tilapia/ Pangus / Carp Hatchery 10Kg",
+      "bag_weight": 10.0,
+      "opening_stock": 0.0,
+      "default_rate": 0.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-09-30 12:17:35",
+      "product_code": "হ্যাচারি"
+    },
+    {
+      "id": 166,
+      "name": "Hatchery (Common) 5 KG",
+      "bag_weight": 5.0,
+      "opening_stock": 0.0,
+      "default_rate": 625.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "801"
+    },
+    {
+      "id": 167,
+      "name": "Nursery (Common) 10 KG",
+      "bag_weight": 10.0,
+      "opening_stock": 0.0,
+      "default_rate": 910.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "802"
+    },
+    {
+      "id": 168,
+      "name": "Nursery-1 (Common) Floating 10 KG",
+      "bag_weight": 10.0,
+      "opening_stock": 0.0,
+      "default_rate": 1360.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "501"
+    },
+    {
+      "id": 169,
+      "name": "Nursery-2 (Common) Floating 10 KG",
+      "bag_weight": 10.0,
+      "opening_stock": 0.0,
+      "default_rate": 1320.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "502"
+    },
+    {
+      "id": 170,
+      "name": "Nursery-3 (Common) Premium Floating 20 KG",
+      "bag_weight": 20.0,
+      "opening_stock": 0.0,
+      "default_rate": 2520.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "503"
+    },
+    {
+      "id": 171,
+      "name": "Nursery-3 (Common) Standard Floating 20 KG",
+      "bag_weight": 20.0,
+      "opening_stock": 0.0,
+      "default_rate": 2380.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "504"
+    },
+    {
+      "id": 172,
+      "name": "Pabda/Gulsha/Sing Starter Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 2875.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "505"
+    },
+    {
+      "id": 173,
+      "name": "Pre Starter (Common) Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 2450.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "506"
+    },
+    {
+      "id": 174,
+      "name": "Koi Starter Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 2250.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "541"
+    },
+    {
+      "id": 175,
+      "name": "Koi Grower Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 2225.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "542"
+    },
+    {
+      "id": 176,
+      "name": "Tilapia/Pangus Pre Starter Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 2200.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "511"
+    },
+    {
+      "id": 177,
+      "name": "Tilapia Starter Premium Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1975.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "512"
+    },
+    {
+      "id": 178,
+      "name": "Tilapia Grower Premium Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1950.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "513"
+    },
+    {
+      "id": 179,
+      "name": "Tilapia Grower Standard Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1800.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "514"
+    },
+    {
+      "id": 180,
+      "name": "Tilapia Finisher Standard Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1775.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "515"
+    },
+    {
+      "id": 181,
+      "name": "Pangus Starter Premium Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1950.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "521"
+    },
+    {
+      "id": 182,
+      "name": "Pangus Grower Premium Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1825.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "522"
+    },
+    {
+      "id": 183,
+      "name": "Pangus Finisher Premium Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1800.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "523"
+    },
+    {
+      "id": 184,
+      "name": "Pangus Grower Standard Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1700.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "525"
+    },
+    {
+      "id": 185,
+      "name": "Pangus Finisher Standard Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1675.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "526"
+    },
+    {
+      "id": 186,
+      "name": "Carp Starter Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1600.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "531"
+    },
+    {
+      "id": 187,
+      "name": "Carp Grower Premium Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1575.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "532"
+    },
+    {
+      "id": 188,
+      "name": "Carp Grower Standard Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1500.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "534"
+    },
+    {
+      "id": 189,
+      "name": "Carp Finisher Standard Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1487.5,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "533"
+    },
+    {
+      "id": 190,
+      "name": "Carp Poly Culture Floating 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1400.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "535"
+    },
+    {
+      "id": 191,
+      "name": "Starter (Common) Sinking Crumble 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1675.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "601"
+    },
+    {
+      "id": 192,
+      "name": "Starter (Common) Sinking 2 mm 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1637.5,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "611"
+    },
+    {
+      "id": 193,
+      "name": "Pangus/Tilapia Grower Premium Sinking 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1600.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "612"
+    },
+    {
+      "id": 194,
+      "name": "Pangus/Tilapia Finisher Premium Sinking 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1575.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "613"
+    },
+    {
+      "id": 195,
+      "name": "Pangus Grower Standard Sinking 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1500.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "614"
+    },
+    {
+      "id": 196,
+      "name": "Pangus Finisher Standard Sinking 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1475.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "615"
+    },
+    {
+      "id": 197,
+      "name": "Carp Grower Premium Sinking 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1400.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "622"
+    },
+    {
+      "id": 198,
+      "name": "Carp Grower Standard Sinking 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1312.5,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "623"
+    },
+    {
+      "id": 199,
+      "name": "Carp Finisher Standard Sinking 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1287.5,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "624"
+    },
+    {
+      "id": 200,
+      "name": "Galda Pre Nursery Premium 1 KG",
+      "bag_weight": 1.0,
+      "opening_stock": 0.0,
+      "default_rate": 111.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "700"
+    },
+    {
+      "id": 201,
+      "name": "Galda Starter-1 Premium 5 KG",
+      "bag_weight": 5.0,
+      "opening_stock": 0.0,
+      "default_rate": 490.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "701"
+    },
+    {
+      "id": 202,
+      "name": "Galda Starter-2 Premium 10 KG",
+      "bag_weight": 10.0,
+      "opening_stock": 0.0,
+      "default_rate": 980.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "702"
+    },
+    {
+      "id": 203,
+      "name": "Galda Starter-3 Premium 10 KG",
+      "bag_weight": 10.0,
+      "opening_stock": 0.0,
+      "default_rate": 980.0,
+      "low_stock_level": 10.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "703"
+    },
+    {
+      "id": 204,
+      "name": "Galda Grower Premium 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 2150.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "704"
+    },
+    {
+      "id": 205,
+      "name": "Galda Starter Standard 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1950.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "711"
+    },
+    {
+      "id": 206,
+      "name": "Galda Grower Standard 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1875.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "712"
+    },
+    {
+      "id": 207,
+      "name": "Galda Grower Economy 25 KG",
+      "bag_weight": 25.0,
+      "opening_stock": 0.0,
+      "default_rate": 1650.0,
+      "low_stock_level": 20.0,
+      "created_at": "2026-10-15 12:09:47",
+      "product_code": "721"
+    }
+  ],
+  "customers": [
+    {
+      "id": 1,
+      "name": "Cash Customer",
+      "mobile": "",
+      "address": "Walk-in sale",
+      "opening_due": 0.0,
+      "created_at": "2026-09-30 12:12:42"
+    }
+  ],
+  "company_orders": [],
+  "sales": [],
+  "customer_payments": [],
+  "stock_adjustments": [],
+  "transactions": []
+}

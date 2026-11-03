@@ -1,0 +1,38 @@
+name: arafat_traders
+description: Dedicated Flutter dealership workspace with secure offline sync.
+publish_to: none
+version: 3.0.3+9
+environment:
+  sdk: '>=3.8.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  http: ^1.3.0
+  cryptography: ^2.7.0
+  flutter_secure_storage: ^11.2.0
+  path_provider: ^2.1.5
+  intl: ^0.20.2
+  uuid: ^4.5.1
+  flutter_svg: ^2.2.3
+  file_picker: ^13.3.0
+  share_plus: ^13.3.1
+  printing: ^5.15.1
+  pdf: ^3.13.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/brand/
+    - assets/fonts/
+  fonts:
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/manrope.ttf
+    - family: NotoBengali
+      fonts:
+        - asset: assets/fonts/noto-bengali.ttf
