@@ -13,6 +13,9 @@ GitHub account দিয়ে এই কম্পিউটারে Git authentica
 
 ```bash
 cd /home/sami/Downloads/Dealership_Management_System/releases/github/Dealership_Management_System
+git status --short
+git add -A
+git commit -m "Remove obsolete repository artifacts"
 git push -u origin main
 ```
 
@@ -38,7 +41,7 @@ Remote-এ অন্য কেউ meantime commit করলে force push কর
 - `online-site/`: বর্তমান web/backend-এর সব tracked file; hosting bindings/config ও SQL migrations।
 - Root Python app, static files, public product CSV এবং local-app tests।
 - `releases/`: build verification-এর certificate baseline JSON এবং release instructions।
-- `SOURCE_MANIFEST.json`: কপি করা প্রতিটি source file-এর SHA-256।
+- বর্তমান source ও আগের পরিবর্তন Git history-তে আছে; আলাদা export manifest প্রয়োজন নেই।
 
 Signing key/password, session/config secrets, local business database/backups,
 customer records, node_modules, SDK, build caches এবং বড় generated release

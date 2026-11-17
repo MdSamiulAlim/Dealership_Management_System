@@ -28,5 +28,5 @@ are verified for all three architectures. See the adjacent verification JSON and
 tested. Build output included a nonfatal Gradle file-watcher warning; the release
 build exited successfully and all artifact checks passed.
 
-Current Flutter source is in `../mobile/`. The older 3.0.3 source ZIP predates these
-changes; a new source ZIP was not requested for this release.
+Current Flutter source is in `../mobile/`. Generated APK binaries and source ZIPs
+are kept outside this source repository. Follow `mobile/README.md` to build them.

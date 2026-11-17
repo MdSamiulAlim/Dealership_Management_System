@@ -43,7 +43,10 @@ coverage/
 mobile/android/.kotlin/
 mobile/android/.cxx/
 
-# Generated release packages remain local; keep verification JSON/readmes.
+# Generated source-export inventory; Git records the current source tree.
+/SOURCE_MANIFEST.json
+
+# Generated release packages remain local; keep current verification and baseline.
 /releases/github/
 /releases/*.apk
 /releases/*.aab
