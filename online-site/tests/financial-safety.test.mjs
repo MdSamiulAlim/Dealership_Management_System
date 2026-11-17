@@ -7,7 +7,7 @@ import {database,D1Adapter} from './d1-adapter.mjs';
 import {executeCommand,workspaceBootstrap} from '../lib/workspace.ts';
 import {bootstrap,deleteRecord,insertRecord,ensureSeeded} from '../lib/ledger.ts';
 import {reserveLoginAttempt} from '../lib/login-limiter.ts';
-import {journalReports,allocateCents} from '../public/report-journal.mjs';
+import {journalReports,allocateCents,percentageDiscountCents} from '../public/report-journal.mjs';
 const command=(method,path,payload)=>({id:randomUUID(),method,path,payload,created_at:Date.now()});
 const txn=(type,amount,account='Cash')=>({txn_date:'2026-10-23',type,amount,account});
 
@@ -83,9 +83,9 @@ test('40 concurrent login reservations share an atomic budget across database cl
 
 function offlineTools(){
  let source=readFileSync(new URL('../public/offline-store.js',import.meta.url),'utf8');
- source=source.replace('let journalReports=null,shares=null','let journalReports=testJournal,shares=testShares');
+ source=source.replace('let journalReports=null,shares=null,percentageDiscount=null','let journalReports=testJournal,shares=testShares,percentageDiscount=testPercentage');
  source=source.replace('window.WorkspaceStore={','window.Check={apply,recalculate,setData:d=>data=d};window.WorkspaceStore={');
- const context=vm.createContext({testJournal:journalReports,testShares:allocateCents,window:{addEventListener(){},dispatchEvent(){}},navigator:{},localStorage:{getItem(){return null}},structuredClone,Intl,setInterval(){}});
+ const context=vm.createContext({testJournal:journalReports,testShares:allocateCents,testPercentage:percentageDiscountCents,window:{addEventListener(){},dispatchEvent(){}},navigator:{},localStorage:{getItem(){return null}},structuredClone,Intl,setInterval(){}});
  vm.runInContext(source,context);return context.window.Check;
 }
 

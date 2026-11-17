@@ -73,10 +73,7 @@ function renderSyncStatus(sync) {
 }
 
 function setDefaultDates() {
-  const today = new Date().toISOString().slice(0, 10);
-  $$('input[type="date"]').forEach((input) => {
-    if (!input.value) input.value = today;
-  });
+  // New business entries start blank. The header clock remains automatic.
 }
 
 function productLabel(item) {
@@ -84,26 +81,23 @@ function productLabel(item) {
 }
 
 function fillOptions() {
-  $$("select[data-options]").forEach((select) => {
+  $$('select[data-options]').forEach(select => {
     const collection = state[select.dataset.options] || [];
-    const current = select.value;
-    select.innerHTML = collection
-      .map((item) => `<option value="${item.id}">${escapeHtml(productLabel(item))}</option>`)
-      .join("");
-    if (current) select.value = current;
-    if (!select.value && collection[0]) select.value = collection[0].id;
-    syncProductMeta(select);
+    const current = window.WorkspaceStore?.resolveId?.(select.value) ?? select.value;
+    select.innerHTML = '<option value="" selected disabled>Choose an option</option>' + collection
+      .map(item => `<option translate="no" value="${item.id}">${escapeHtml(productLabel(item) + (select.dataset.stockCount ? ' — ' + formatQty(item.current_stock) + ' Bag' : ''))}</option>`).join('')
+      + (select.dataset.allowNew ? '<option value="new">+ New Customer</option>' : '');
+    select.value = current || '';
   });
 }
 
 function syncProductMeta(select) {
-  if (select.dataset.options !== "products") return;
-  const product = state.products.find((item) => String(item.id) === String(select.value));
-  if (!product) return;
-  const rateTarget = select.dataset.rateTarget ? document.getElementById(select.dataset.rateTarget) : null;
-  const weightTarget = select.dataset.weightTarget ? document.getElementById(select.dataset.weightTarget) : null;
-  if (rateTarget && !rateTarget.value) rateTarget.value = product.default_rate || 0;
-  if (weightTarget) weightTarget.value = product.bag_weight || 50;
+  if (select.dataset.options !== 'products') return;
+  // Selection identifies the product; rate and weight remain user inputs.
+  for (const id of [select.dataset.rateTarget, select.dataset.weightTarget]) {
+    const input = id ? document.getElementById(id) : null;
+    if (input) input.value = '';
+  }
 }
 
 function renderMetrics() {
@@ -124,7 +118,7 @@ function renderMetrics() {
 }
 
 function deleteButton(endpoint, id) {
-  return `<button class="danger" data-delete="${endpoint}" data-id="${id}" title="Delete record">Delete</button>`;
+  return `<div class="record-actions"><button type="button" data-edit="${endpoint}" data-id="${id}">Edit</button><button class="danger" data-delete="${endpoint}" data-id="${id}" title="Delete record">Delete</button></div>`;
 }
 
 function emptyRow(cols, message = "No data yet") {
@@ -361,6 +355,7 @@ function renderAll() {
   renderMoney();
   renderReports();
   setDefaultDates();
+  renderAdjustments();
 }
 
 function formPayload(form) {
@@ -447,7 +442,7 @@ async function handleDelete(button) {
 function syncTransferForm(form) {
   const type=form.elements.type.value,transfer=['Bank Deposit','Bank Withdraw'].includes(type);
   form.elements.account.disabled=transfer;
-  if(transfer)form.elements.account.value=type==='Bank Deposit'?'Cash':'Bank';
+  if(transfer){form.elements.account.value=type==='Bank Deposit'?'Cash':'Bank';form.dataset.transferAccount='derived';}else if(form.dataset.transferAccount==='derived'){form.elements.account.value='';delete form.dataset.transferAccount;}
   const hint=form.querySelector('[data-transfer-hint]');
   hint.hidden=!transfer;
   hint.textContent=transfer?(type==='Bank Deposit'?'Cash → Bank':'Bank → Cash')+' · Both accounts update together.':'';
@@ -491,6 +486,84 @@ function bindEvents() {
   $("#refreshBtn").addEventListener("click", () => load().then(() => toast("Refreshed")));
   $("#syncAkijBtn")?.addEventListener("click", handleAkijSync);
 }
+
+let editingRecord = null;
+let editingRecordDirty = false;
+let editingRecordSaving = false;
+function renderAdjustments() {
+  let section = $('#localAdjustmentHistory');
+  if (!section) {
+    section = document.createElement('article');
+    section.id = 'localAdjustmentHistory';
+    section.className = 'card';
+    section.innerHTML = '<h2>Stock adjustment history</h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Bags</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="localAdjustmentRows"></tbody></table></div>';
+    $('#stock').append(section);
+  }
+  $('#localAdjustmentRows').innerHTML = state.adjustments.length ? state.adjustments.map(r => `<tr><td>${escapeHtml(r.adjust_date)}</td><td>${escapeHtml(r.product_name)}</td><td>${escapeHtml(r.type)}</td><td>${formatQty(r.quantity)}</td><td>${escapeHtml(r.notes)}</td><td>${deleteButton('adjustments',r.id)}</td></tr>`).join('') : emptyRow(6);
+}
+function localEditor() {
+  let dialog = $('#localRecordDialog');
+  if (dialog) return dialog;
+  dialog = document.createElement('dialog');
+  dialog.id = 'localRecordDialog';
+  dialog.innerHTML = '<h2>Edit record</h2><form id="localRecordForm"></form><p id="localRecordError" role="alert"></p><button type="button" id="cancelLocalRecord">Cancel</button>';
+  document.body.append(dialog);
+  const close = () => {
+    if (editingRecordSaving) return;
+    if (editingRecordDirty && !window.confirm('Discard unsaved form changes?')) return;
+    dialog.close();
+  };
+  $('#cancelLocalRecord').addEventListener('click',close);
+  dialog.addEventListener('cancel',e=>{e.preventDefault();close();});
+  dialog.addEventListener('close',()=>{editingRecord=null;editingRecordDirty=false;$('#localRecordForm').innerHTML='';$('#localRecordError').textContent='';});
+  $('#localRecordForm').addEventListener('input',()=>{editingRecordDirty=true;});
+  $('#localRecordForm').addEventListener('change',()=>{editingRecordDirty=true;});
+  $('#localRecordForm').addEventListener('submit',async event=>{
+    event.preventDefault();
+    if (!editingRecord || editingRecordSaving || !event.currentTarget.reportValidity()) return;
+    const {entity,original,partner}=editingRecord;
+    const p=Object.fromEntries(new FormData(event.currentTarget));
+    p.original=original;p.confirmed=true;
+    if (entity==='payments') p.customer_id=original.customer_id;
+    if (partner) {p.original_transfer=partner;p.account=original.account;}
+    if (['orders','adjustments','transactions','sales'].includes(entity) && !window.confirm('Save changes and recalculate stock and financial balances?')) return;
+    editingRecordSaving=true;
+    const save=event.currentTarget.querySelector('[type=submit]');save.disabled=true;
+    try {
+      Object.assign(state,await api(`/api/${entity}/${original.id}`,{method:'PATCH',body:JSON.stringify(p)}));
+      dialog.close();renderAll();toast('Saved successfully');
+    } catch (e) {$('#localRecordError').textContent=e.message;}
+    finally {editingRecordSaving=false;save.disabled=false;}
+  });
+  return dialog;
+}
+function editLocalRecord(entity,id) {
+  const row=state[entity]?.find(r=>String(r.id)===String(id));
+  if (!row) return;
+  const source=$(`form[data-endpoint="${entity}"]`);
+  const dialog=localEditor(),form=$('#localRecordForm');
+  editingRecord={entity,original:structuredClone(row)};
+  if(row.transfer_id) {
+    const partner=state.transactions.find(r=>r.transfer_id===row.transfer_id&&r.id!==row.id);
+    if(!partner){toast('Reload the complete transfer before editing.');return;}
+    editingRecord.partner=structuredClone(partner);
+  }
+  form.innerHTML=source.innerHTML;
+  for(const el of form.querySelectorAll('[id]'))el.removeAttribute('id');
+  for(const el of form.querySelectorAll('[data-rate-target]'))el.removeAttribute('data-rate-target');
+  for(const name of entity==='products'?['opening_stock']:entity==='customers'?['opening_due']:[])form.elements.namedItem(name)?.closest('label')?.remove();
+  for(const field of form.querySelectorAll('[name]')) {
+    if(field.dataset.options)field.innerHTML=(state[field.dataset.options]||[]).map(r=>`<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+    if(entity==='transactions'&&field.name==='type')for(const option of [...field.options])if(['Bank Deposit','Bank Withdraw'].includes(option.value)!==!!row.transfer_id)option.remove();
+    field.value=row[field.name]??'';
+    if(field.name==='quantity'){field.step='1';field.min='1';}
+    if(entity==='payments'&&field.name==='customer_id'||row.transfer_id&&field.name==='account')field.disabled=true;
+  }
+  form.querySelector('[type=submit]').textContent='Save changes';
+  $('#localRecordError').textContent='';editingRecordDirty=false;
+  dialog.showModal();
+}
+document.addEventListener('click',event=>{const button=event.target.closest('[data-edit]');if(button)editLocalRecord(button.dataset.edit,button.dataset.id);});
 
 bindEvents();
 load().catch((error) => toast(error.message));

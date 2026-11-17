@@ -1,9 +1,10 @@
-import {allocateCents as allocate} from '../public/money-allocation.mjs';
+import {allocateCents as allocate,percentageDiscountCents} from '../public/money-allocation.mjs';
 import {journalReports} from '../public/report-journal.mjs';
 import {applySupplierCatalog,supplierCatalogState,removeUnlistedProducts} from './supplier-catalog.ts';
 import { workspaceEpoch, requireWorkspaceEpoch, guardWorkspaceWrites } from "./workspace-access.ts";
 import { bootstrap, ensureSeeded, isTransfer, prepareTransfer, InputError, money, prepareInsert, productUpdate, customerUpdate, wholeBags, today, validDate, calculatedTotal, integrityError, nonnegative, recordId, choice, requireActiveProduct } from "./ledger.ts";
 import type { Payload, SqlRow, ProductRecord, CustomerRecord, InvoiceRecord, InvoiceItemRecord, SyncOperation, BusinessSettings } from "./records.ts";
+import {prepareRecordEdit} from './record-edits.ts';
 const defaults={name:"Arafat Traders",phone:"+8801646130402",address:"",large_discount_percent:20,version:1};
 const settingKey="business_settings_v1";
 const tables:Record<string,string>={products:"products",customers:"customers",orders:"company_orders",payments:"customer_payments",adjustments:"stock_adjustments",transactions:"transactions"};
@@ -17,7 +18,8 @@ export function invoiceAmounts(p:Payload){
  const items=p.items.map((item:Payload)=>{if(!item||typeof item!=="object"||Array.isArray(item)||item.rate==null||String(item.rate).trim()==="")throw new InputError("Enter a quantity and rate for every invoice item.");const quantity=wholeBags(item.quantity,"Quantity",1),rate=nonnegative(item.rate,"Rate");if(quantity<=0||rate<0)throw new InputError("Quantity must be positive and rate cannot be negative.");return {product_id:positiveId(item.product_id),quantity,rate,gross:cents(quantity*rate)};});
  const gross=items.reduce((sum:number,i)=>sum+i.gross,0);if(gross>100000000000000)throw new InputError("Invoice subtotal cannot exceed 1,000,000,000,000.");const value=nonnegative(p.discount_value??p.discount??0,"Discount");
  choice(p.discount_type,["amount","percent"],"amount");
- const discount=p.discount_type==="percent"?Math.round(gross*value/100):cents(value);
+ if(p.discount_type==="percent"&&value>100)throw new InputError("Discount must be between zero and the subtotal.");
+ const discount=p.discount_type==="percent"?percentageDiscountCents(gross,cents(value)):cents(value);
  if(value<0||discount<0||discount>gross)throw new InputError("Discount must be between zero and the subtotal.");
  const total=gross-discount;calculatedTotal(p,total/100);const paid=cents(nonnegative(p.paid_amount??0,"Paid amount"));if(paid<0||paid>total)throw new InputError("Paid amount cannot exceed the invoice total.");
  const net=allocate(total,items.map((i)=>i.gross)),paidParts=allocate(paid,net);
@@ -190,9 +192,8 @@ export async function executeCommand(db:D1Database,command:Payload){
     if(amount<=0||!["Cash","Bank"].includes(p.account as string)||notes.length>1000)throw new InputError("Enter a positive collection amount and choose Cash or Bank.");
     statements.push(db.prepare(`UPDATE customer_payments SET payment_date=?,amount=?,account=?,notes=? WHERE ${condition}`).bind(date(p.payment_date),amount,p.account,notes,...args));
   }
-  else if(entity==="transactions") {
-    if(!["Expense","Transport Cost","Other Expense"].includes(row.type as string)||!["Expense","Transport Cost","Other Expense"].includes(p.type as string)||money(p.amount)<=0||!["Cash","Bank"].includes(p.account as string))throw new InputError("Check the expense details.");
-    statements.push(db.prepare(`UPDATE transactions SET txn_date=?,type=?,amount=?,account=?,category=?,reference=?,notes=? WHERE ${condition}`).bind(date(p.txn_date),p.type,money(p.amount),p.account,clean(p.category)||"General",clean(p.reference),clean(p.notes),...args));
+  else if(["orders","adjustments","transactions"].includes(entity)) {
+    statements.push(...await prepareRecordEdit(db,entity,row,p,condition,args));
   } else throw new InputError("Use the invoice editor to edit a sale.",404);
  }else throw new InputError("Unsupported command.",404);
  try{await db.batch([...statements,marker]);}catch(error){const replay=await previous(db,key,hash);if(replay)return commandResult(db,replay,true);integrityError(error);}

@@ -5,6 +5,13 @@ import test from "node:test";
 const source = readFileSync(new URL("../public/dealership.js", import.meta.url), "utf8").split("\nbindEvents();")[0];
 function context() { const c = vm.createContext({document:{querySelector(){return null;}}, Intl, window: {} }); vm.runInContext(source, c); return c; }
 const get = (c, expression) => JSON.parse(vm.runInContext(`JSON.stringify(${expression})`, c));
+test('classic scripts keep the shared product lookup for active and archived products',()=>{
+  const c=context();
+  vm.runInContext("state.products=[{id:1,name:'Current'}];state.archived_products=[{id:2,name:'Archived'}]",c);
+  assert.equal(typeof c.findProduct,'function');
+  assert.equal(c.findProduct('1').name,'Current');
+  assert.equal(c.findProduct('2').name,'Archived');
+});
 
 test("stock/payment filters and Bengali digit search keep independent results", () => {
   const c = context();

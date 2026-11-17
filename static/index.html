@@ -81,12 +81,12 @@
         </div>
         <form class="entry-form" data-endpoint="sales">
           <label>Date<input name="sale_date" type="date" required /></label>
-          <label>Customer<select name="customer_id" data-options="customers" required></select></label>
-          <label>Product<select name="product_id" data-options="products" data-rate-target="sale_rate" required></select></label>
+          <label>Customer<select name="customer_id" data-options="customers" required><option value="" selected disabled>Choose an option</option></select></label>
+          <label>Product<select name="product_id" data-options="products" data-rate-target="sale_rate" required><option value="" selected disabled>Choose an option</option></select></label>
           <label>Quantity Bag<input name="quantity" type="number" min="0" step="0.01" required /></label>
           <label>Rate<input name="rate" id="sale_rate" type="number" min="0" step="0.01" required /></label>
-          <label>Paid<input name="paid_amount" type="number" min="0" step="0.01" value="0" /></label>
-          <label>Account<select name="account"><option>Cash</option><option>Bank</option></select></label>
+          <label>Paid<input required name="paid_amount" type="number" min="0" step="0.01" /></label>
+          <label>Account<select name="account" required><option value="" selected disabled>Choose an option</option><option>Cash</option><option>Bank</option></select></label>
           <label class="wide">Notes<input name="notes" placeholder="Invoice, delivery note, etc." /></label>
           <button type="submit">Save Sale</button>
         </form>
@@ -115,11 +115,11 @@
         </div>
         <form class="entry-form" data-endpoint="orders">
           <label>Order Date<input name="order_date" type="date" required /></label>
-          <label>Product<select name="product_id" data-options="products" data-weight-target="order_weight" data-rate-target="order_rate" required></select></label>
+          <label>Product<select name="product_id" data-options="products" data-weight-target="order_weight" data-rate-target="order_rate" required><option value="" selected disabled>Choose an option</option></select></label>
           <label>Quantity Bag<input name="quantity" type="number" min="0" step="0.01" required /></label>
-          <label>Bag Weight<input name="bag_weight" id="order_weight" type="number" min="0" step="0.01" value="50" /></label>
+          <label>Bag Weight<input required name="bag_weight" id="order_weight" type="number" min="0" step="0.01" /></label>
           <label>Rate<input name="rate" id="order_rate" type="number" min="0" step="0.01" required /></label>
-          <label>Status<select name="status"><option>Pending</option><option>Confirmed</option><option>Delivered</option></select></label>
+          <label>Status<select name="status" required><option value="" selected disabled>Choose an option</option><option>Pending</option><option>Confirmed</option><option>Delivered</option></select></label>
           <label>Delivery Date<input name="delivery_date" type="date" /></label>
           <label>Challan No.<input name="invoice_no" /></label>
           <label class="wide">Notes<input name="notes" /></label>
@@ -154,16 +154,16 @@
         <form class="entry-form" data-endpoint="products">
           <label>Feed Name<input name="name" required /></label>
           <label>Packet Code<input name="product_code" placeholder="e.g. ব্রোঃ গো-২" /></label>
-          <label>Bag Weight<input name="bag_weight" type="number" min="0" step="0.01" value="50" /></label>
-          <label>Opening Stock<input name="opening_stock" type="number" step="0.01" value="0" /></label>
-          <label>Default Rate<input name="default_rate" type="number" step="0.01" value="0" /></label>
-          <label>Low Stock Alert<input name="low_stock_level" type="number" step="0.01" value="10" /></label>
+          <label>Bag Weight<input required name="bag_weight" type="number" min="0" step="0.01" /></label>
+          <label>Opening Stock<input required name="opening_stock" type="number" step="0.01" /></label>
+          <label>Default Rate<input required name="default_rate" type="number" step="0.01" /></label>
+          <label>Low Stock Alert<input required name="low_stock_level" type="number" step="0.01" /></label>
           <button type="submit">Add Product</button>
         </form>
         <form class="entry-form compact" data-endpoint="adjustments">
           <label>Date<input name="adjust_date" type="date" required /></label>
-          <label>Product<select name="product_id" data-options="products" required></select></label>
-          <label>Type<select name="type"><option>Return</option><option>Damage</option><option>Loss</option><option>Manual Add</option><option>Manual Minus</option></select></label>
+          <label>Product<select name="product_id" data-options="products" required><option value="" selected disabled>Choose an option</option></select></label>
+          <label>Type<select name="type" required><option value="" selected disabled>Choose an option</option><option>Return</option><option>Damage</option><option>Loss</option><option>Manual Add</option><option>Manual Minus</option></select></label>
           <label>Quantity<input name="quantity" type="number" min="0" step="0.01" required /></label>
           <label class="wide">Notes<input name="notes" /></label>
           <button type="submit">Save Adjustment</button>
@@ -195,7 +195,7 @@
         <form class="entry-form" data-endpoint="customers">
           <label>Name<input name="name" required /></label>
           <label>Mobile<input name="mobile" /></label>
-          <label>Opening Due<input name="opening_due" type="number" step="0.01" value="0" /></label>
+          <label>Opening Due<input required name="opening_due" type="number" step="0.01" /></label>
           <label class="wide">Address<input name="address" /></label>
           <button type="submit">Add Customer</button>
         </form>
@@ -222,17 +222,17 @@
         </div>
         <form class="entry-form compact" data-endpoint="payments">
           <label>Date<input name="payment_date" type="date" required /></label>
-          <label>Customer<select name="customer_id" data-options="customers" required></select></label>
+          <label>Customer<select name="customer_id" data-options="customers" required><option value="" selected disabled>Choose an option</option></select></label>
           <label>Amount<input name="amount" type="number" min="0" step="0.01" required /></label>
-          <label>Account<select name="account"><option>Cash</option><option>Bank</option></select></label>
+          <label>Account<select name="account" required><option value="" selected disabled>Choose an option</option><option>Cash</option><option>Bank</option></select></label>
           <label class="wide">Notes<input name="notes" /></label>
           <button type="submit">Receive Payment</button>
         </form>
         <form class="entry-form compact" data-endpoint="transactions">
           <label>Date<input name="txn_date" type="date" required /></label>
-          <label>Type<select name="type"><option>Company Payment</option><option>Expense</option><option>Transport Cost</option><option>Other Income</option><option>Other Expense</option><option>Bank Deposit</option><option>Bank Withdraw</option></select></label>
+          <label>Type<select name="type" required><option value="" selected disabled>Choose an option</option><option>Company Payment</option><option>Expense</option><option>Transport Cost</option><option>Other Income</option><option>Other Expense</option><option>Bank Deposit</option><option>Bank Withdraw</option></select></label>
           <label>Amount<input name="amount" type="number" min="0" step="0.01" required /></label>
-          <label>Account<select name="account"><option>Cash</option><option>Bank</option></select></label>
+          <label>Account<select name="account" required><option value="" selected disabled>Choose an option</option><option>Cash</option><option>Bank</option></select></label>
           <label class="wide">Notes<input name="notes" /></label>
           <p class="helper-text wide" data-transfer-hint hidden></p><button type="submit">Save Transaction</button>
         </form>

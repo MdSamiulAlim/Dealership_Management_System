@@ -3,8 +3,8 @@
   const DB_NAME='arafat-secure-workspace-v2', STORE='vault', VAULT='current';
   const clone=v=>structuredClone(v), round=v=>Math.round((Number(v||0)+Number.EPSILON)*100)/100;
   const uuid=()=>crypto.randomUUID(), encode=b=>{const bytes=new Uint8Array(b);let text='';for(let i=0;i<bytes.length;i+=8192)text+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(text);}, decode=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-  let journalReports=null,shares=null;
-  async function loadJournal(){if(!journalReports)({journalReports,allocateCents:shares}=await import('/report-journal.mjs?v=financial-exact-2026-v2'));}
+  let journalReports=null,shares=null,percentageDiscount=null;
+  async function loadJournal(){if(!journalReports)({journalReports,allocateCents:shares,percentageDiscountCents:percentageDiscount}=await import('/report-journal.mjs?v=percentage-half-up-2026-v1'));}
   let dbPromise,key=null,authorization=null,data=null,record=null,started=false,unlockWait=null,unlockResolve=null,flushing=false,lastError='',online=true;
   let signedOut=false,sessionVersion=0,switching=false,resetting=false;try{signedOut=localStorage.getItem('arafat-signed-out')==='true';}catch{}
   const channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('arafat-workspace'):null;
@@ -157,7 +157,8 @@
     const gross=items.map(i=>{validAmount(i.quantity*i.rate);return Math.round(round(i.quantity*i.rate)*100);});
     const subtotal=gross.reduce((a,b)=>a+b,0);if(subtotal>100000000000000)throw Error('Invoice subtotal cannot exceed 1,000,000,000,000.');
     const raw=p.discount_value??p.discount??0;validAmount(raw);const value=round(raw);if(!['amount','percent','',undefined,null].includes(p.discount_type))throw Error('Choose amount or percent.');
-    const discount=p.discount_type==='percent'?Math.round(subtotal*value/100):Math.round(value*100);const total=subtotal-discount;validAmount(p.paid_amount??0);const paid=Math.round(round(p.paid_amount)*100);
+    if(p.discount_type==='percent'&&value>100)throw Error('Check the discount and paid amount.');
+    const discount=p.discount_type==='percent'?percentageDiscount(subtotal,Math.round(value*100)):Math.round(value*100);const total=subtotal-discount;validAmount(p.paid_amount??0);const paid=Math.round(round(p.paid_amount)*100);
     if(discount<0||total<0||paid>total)throw Error('Check the discount and paid amount.');
     if(p.total_amount!==undefined&&p.total_amount!==''&&round(p.total_amount)!==total/100)throw Error('Total must match the calculated quantity and rate.');
     const net=shares(total,gross),payments=shares(paid,net);return {subtotal:subtotal/100,discount:discount/100,total_amount:total/100,paid_amount:paid/100,items:items.map((i,n)=>({...i,line_total:net[n]/100,paid_amount:payments[n]/100}))};
@@ -184,6 +185,25 @@
     if(['orders','sales','adjustments'].includes(entity)&&method==='POST'&&product(p.product_id)?.archived)throw Error('This product is archived. Choose a current product.');
     if(entity==='adjustments'&&method==='POST'&&!['Return','Manual Add'].includes(p.type)){const row=product(p.product_id);if(row&&p.quantity>productStock(snapshot,row))stockError();}
     if(method==='DELETE'&&['orders','adjustments'].includes(entity)){const row=snapshot[entity].find(r=>same(r.id,id));if(row&&(entity==='orders'?row.status==='Delivered':['Return','Manual Add'].includes(row.type))){const feed=product(row.product_id);if(feed&&row.quantity>productStock(snapshot,feed))stockError();}}
+    if(method==='PATCH'&&['orders','adjustments'].includes(entity)){
+      const old=snapshot[entity].find(r=>same(r.id,id));if(!old)throw Error('Record not found. Refresh and try again.');
+      if(p.confirmed!==true)throw Error('Confirm the stock change first.');
+      const next={...old,...p},feed=product(next.product_id);
+      if(!feed||feed.archived&&!same(old.product_id,next.product_id))throw Error('Choose a current product.');
+      const effect=r=>entity==='orders'?(r.status==='Delivered'?Number(r.quantity):0):(['Return','Manual Add'].includes(r.type)?1:-1)*Number(r.quantity);
+      for(const row of allProducts(snapshot).filter(r=>same(r.id,old.product_id)||same(r.id,next.product_id))){const delta=(same(row.id,next.product_id)?effect(next):0)-(same(row.id,old.product_id)?effect(old):0);if(delta<0&&productStock(snapshot,row)+delta<0)stockError();}
+      if(entity==='adjustments'&&!String(p.notes||'').trim())throw Error('Enter a stock adjustment reason.');
+    }
+    if(method==='PATCH'&&entity==='transactions'){
+      const old=snapshot.transactions.find(r=>same(r.id,id));if(!old)throw Error('Record not found. Refresh and try again.');
+      const transfer=['Bank Deposit','Bank Withdraw'].includes(p.type);
+      if(old.transfer_id){
+        const pair=snapshot.transactions.filter(r=>r.transfer_id===old.transfer_id&&!same(r.id,id));
+        if(!transfer||p.confirmed!==true)throw Error('Confirm the transfer edit. Keep it as Cash to Bank or Bank to Cash.');
+        if(pair.length!==1||!p.original_transfer||pair[0].account===old.account)throw Error('Reload the complete transfer before editing.');
+        if(Object.entries(pair[0]).some(([k,v])=>!['pending','original','original_transfer','confirmed'].includes(k)&&p.original_transfer[k]!==v))throw Error('Transfer changed on another device. Refresh first.');
+      }else if(transfer)throw Error('Create a new transfer instead of changing a single transaction into a transfer.');
+    }
   }
   function validateMutation(path,method,p){
     const entity=path.split('/')[2];if(method==='DELETE')return;
@@ -199,6 +219,9 @@
     if('account' in p&&!['Cash','Bank'].includes(p.account))throw Error('Choose Cash or Bank.');
     if(entity==='orders'&&p.status&&!['Pending','Confirmed','Delivered'].includes(p.status))throw Error('Choose a valid order status.');
     if(entity==='orders'&&p.delivery_date)validDate(p.delivery_date);
+    if(entity==='orders'&&'total_amount' in p&&round(p.total_amount)!==round(Number(p.quantity)*Number(p.rate)))throw Error('Total must match the calculated quantity and rate.');
+    if(entity==='transactions'&&!['Company Payment','Expense','Transport Cost','Other Income','Other Expense','Bank Deposit','Bank Withdraw'].includes(p.type))throw Error('Choose a valid transaction type.');
+    for(const field of ['notes','reference','invoice_no','category'])if(['orders','adjustments','transactions'].includes(entity)&&String(p[field]||'').length>(field==='notes'?1000:200))throw Error('Keep notes within 1000 characters and references within 200 characters.');
     if(entity==='adjustments'&&!['Return','Damage','Loss','Manual Add','Manual Minus'].includes(p.type))throw Error('Choose a valid adjustment type.');
 
     if(entity==='payments'&&method==='PATCH'&&(!Number.isFinite(Number(p.amount))||Number(p.amount)<=0||!['Cash','Bank'].includes(p.account)))throw Error('Enter a positive collection amount and choose Cash or Bank.');
@@ -229,7 +252,9 @@
       if(method==='POST'){const row={...p,id:command.temp_id,created_at:new Date(command.created_at).toISOString(),pending:true};for(const field of ['product_id','customer_id','quantity','rate','paid_amount','amount','opening_stock','opening_due','default_rate','bag_weight','low_stock_level'])if(row[field]!==undefined)row[field]=Number(row[field]);if(entity==='orders')row.total_amount=round(row.quantity*row.rate);if(entity==='products')Object.assign(row,{opening_stock:Number(row.opening_stock||0),default_rate:Number(row.default_rate||0),low_stock_level:Number(row.low_stock_level??5),bag_weight:Number(row.bag_weight||50)});if(entity==='transactions'&&['Bank Deposit','Bank Withdraw'].includes(p.type)){row.transfer_id=command.id;row.account=p.type==='Bank Deposit'?'Cash':'Bank';snapshot.transactions.unshift({...row,id:String(command.temp_id)+'-counter',account:row.account==='Cash'?'Bank':'Cash'});}snapshot[entity].unshift(row);}else if(method==='DELETE'){if(['products','customers'].includes(entity)&&snapshot.invoices.some(inv=>entity==='customers'?String(inv.customer_id)===id:inv.items.some(item=>String(item.product_id)===id)))throw Error('This record is used by an invoice and cannot be deleted.');const deleted=snapshot[entity].find(r=>String(r.id)===id);snapshot[entity]=snapshot[entity].filter(r=>String(r.id)!==id&&!(entity==='transactions'&&deleted?.transfer_id&&r.transfer_id===deleted.transfer_id));}else if(method==='PATCH'){const row=snapshot[entity].find(r=>String(r.id)===id);if(row){
         if(entity==='products'&&'current_stock' in p){const actual=productStock(snapshot,row),expected=Number(p.original?.current_stock);if(actual!==expected){row.pending=true;row.stock_conflict=true;return;}const delta=round(Number(p.current_stock)-actual);if(delta)snapshot.adjustments.unshift({id:command.id+'-stock',product_id:row.id,adjust_date:p.adjust_date||new Date(command.created_at).toISOString().slice(0,10),type:delta>0?'Manual Add':'Manual Minus',quantity:Math.abs(delta),notes:`Current Bag ${expected} -> ${p.current_stock}${p.stock_reason?': '+p.stock_reason:''}`,pending:true});}
         if(entity==='customers')for(const invoice of snapshot.invoices.filter(i=>String(i.customer_id)===id&&!i.customer_name)){invoice.customer_name=row.name;invoice.customer_mobile=row.mobile||'';invoice.customer_address=row.address||'';}
-        Object.assign(row,p,{pending:true});
+        if(entity==='orders')p.total_amount=round(Number(p.quantity)*Number(p.rate));
+        if(entity==='transactions'&&row.transfer_id){for(const side of snapshot.transactions.filter(t=>t.transfer_id===row.transfer_id)){const account=side.account,sideId=side.id;Object.assign(side,p,{id:sideId,account,pending:true});}}
+        else Object.assign(row,p,{pending:true});
       }}
     }
   }

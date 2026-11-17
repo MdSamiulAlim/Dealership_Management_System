@@ -1,5 +1,13 @@
-/** Exact largest-remainder allocation of integer cents. Ties use item order.
+/** Exact percentage rounding and allocation in integer cents.
  * BigInt prevents both native overflow and floating-point tie drift. */
+export function percentageDiscountCents(subtotal, basisPoints) {
+ if(!Number.isSafeInteger(subtotal)||subtotal<0||!Number.isSafeInteger(basisPoints)||basisPoints<0||basisPoints>10000)throw Error('Invalid percentage discount.');
+ // basisPoints is hundredths of one percent. Round the exact rational value
+ // once, half up, rather than letting 0.57 become 0.5699999999999999.
+ return Number((BigInt(subtotal)*BigInt(basisPoints)+5000n)/10000n);
+}
+
+/** Largest remainder; equal remainders use item order. */
 export function allocateCents(total,weights){
  if(!Number.isSafeInteger(total)||total<0||weights.some(w=>!Number.isSafeInteger(w)||w<0))throw Error('Invalid allocation amount.');
  const sum=weights.reduce((a,b)=>a+BigInt(b),0n);

@@ -412,3 +412,19 @@ td {
     min-width: 650px;
   }
 }
+/* Record editing stays usable on phones and laptops. */
+#localRecordDialog {
+  width: min(720px, calc(100% - 2rem));
+  max-height: 90dvh;
+  box-sizing: border-box;
+  padding: 24px;
+  border: 1px solid #9aafa7;
+  border-radius: 16px;
+  overflow: auto;
+}
+#localRecordDialog::backdrop { background: rgb(0 0 0 / 45%); }
+#localRecordForm { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+#localRecordForm label { min-width: 0; }
+#localRecordForm input, #localRecordForm select, #localRecordForm textarea { width: 100%; box-sizing: border-box; }
+#localRecordError { color: #9f1919; }
+.record-actions { display: flex; flex-wrap: wrap; gap: 8px; }

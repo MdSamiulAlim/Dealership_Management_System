@@ -65,7 +65,7 @@ def main(artifacts_dir=None):
         status, _, _ = request('/mcp', 'POST', payload={'jsonrpc':'2.0','id':2,'method':'tools/call','params':{'name':'run_daily_backup','arguments':{}}})
         assert status == 403
         _, _, startup_html = request("/")
-        assert b'<script defer src="/offline-store.js?v=reset-save-2026-v1"' in startup_html
+        assert b'<script defer src="/offline-store.js?v=percentage-half-up-2026-v1"' in startup_html
         assert b'_next/static/' not in startup_html and b'__next_f' not in startup_html
         assert request("/api/bootstrap", authorization="Basic " + base64.b64encode(b"TestOwner:wrong").decode())[0] == 401
         authorization = "Basic " + token

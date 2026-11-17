@@ -97,10 +97,7 @@ function renderSyncStatus(sync) {
 }
 
 function setDefaultDates() {
-  const today = state.dashboard.today || new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-  $$('form input[type="date"]').forEach((input) => {
-    if (!input.value) input.value = today;
-  });
+  // New business entries start blank. The header clock remains automatic.
 }
 
 const feedCategories = ["Fish feed", "Cattle feed", "Poultry feed"];
@@ -130,27 +127,23 @@ function productLabel(item) {
 function recordText(value) { return `<span translate="no">${escapeHtml(value)}</span>`; }
 
 function fillOptions() {
-  $$("select[data-options]").forEach((select) => {
-    const collection = select.dataset.options==="products" ? selectableProducts() : state[select.dataset.options] || [];
+  $$('select[data-options]').forEach(select => {
+    const collection = state[select.dataset.options] || [];
     const current = window.WorkspaceStore?.resolveId?.(select.value) ?? select.value;
-    select.innerHTML = collection
-      .map((item) => `<option translate="no" value="${item.id}">${escapeHtml(productLabel(item) + (select.dataset.stockCount ? ` — ${window.AppI18n?.text(formatQty(item.current_stock) + ' Bag') || formatQty(item.current_stock) + ' Bag'}` : ""))}</option>`)
-      .join("") + (select.dataset.allowNew ? '<option value="new">+ New Customer</option>' : "");
-    if (current) select.value = current;
-    if (!select.value && collection[0]) select.value = collection[0].id;
-    const rate = select.closest("form")?.querySelector("input[name=rate]");
-    if (!current || String(current) !== select.value || (rate && !rate.value)) syncProductMeta(select);
+    select.innerHTML = '<option value="" selected disabled>Choose an option</option>' + collection
+      .map(item => `<option translate="no" value="${item.id}">${escapeHtml(productLabel(item) + (select.dataset.stockCount ? ' — ' + formatQty(item.current_stock) + ' Bag' : ''))}</option>`).join('')
+      + (select.dataset.allowNew ? '<option value="new">+ New Customer</option>' : '');
+    select.value = current || '';
   });
 }
 
 function syncProductMeta(select) {
-  if (select.dataset.options !== "products") return;
-  const product = findProduct(select.value);
-  if (!product) return;
-  const rateTarget = select.dataset.rateTarget ? document.getElementById(select.dataset.rateTarget) : null;
-  const weightTarget = select.dataset.weightTarget ? document.getElementById(select.dataset.weightTarget) : null;
-  if (rateTarget && !rateTarget.value) rateTarget.value = product.default_rate || 0;
-  if (weightTarget) weightTarget.value = product.bag_weight || 50;
+  if (select.dataset.options !== 'products') return;
+  // Selection identifies the product; rate and weight remain user inputs.
+  for (const id of [select.dataset.rateTarget, select.dataset.weightTarget]) {
+    const input = id ? document.getElementById(id) : null;
+    if (input) input.value = '';
+  }
 }
 
 function renderMetrics() {
@@ -257,7 +250,13 @@ function updateListCount(kind, total, visible) {
 }
 
 function deleteButton(endpoint, id) {
-  return `<button class="danger" data-delete="${endpoint}" data-id="${id}" title="Delete record">Delete</button>`;
+  const pending=state[endpoint]?.find(row=>String(row.id)===String(id))?.pending;
+  return `<button class="danger" data-delete="${endpoint}" data-id="${id}" title="Delete record" ${pending?'disabled':''}>Delete</button>`;
+}
+
+function editButton(endpoint, id) {
+  const pending=state[endpoint]?.find(row=>String(row.id)===String(id))?.pending;
+  return `<button type="button" class="button secondary" data-record-edit="${endpoint}" data-id="${id}" ${pending?'disabled':''}>Edit</button>`;
 }
 
 function emptyRow(cols, message = "এখনও কোনো রেকর্ড নেই। নতুন তথ্য যোগ করে শুরু করুন।") {
@@ -409,7 +408,7 @@ function renderOrders() {
               <td class="number">${formatMoney(row.total_amount)}</td>
               <td><span class="pill ${row.status === "Delivered" ? "" : "warning"}">${row.status}</span></td>
               <td>${recordText(row.invoice_no)}</td>
-              <td>${deleteButton("orders", row.id)}</td>
+              <td><div class="row-actions">${editButton("orders", row.id)}${deleteButton("orders", row.id)}</div></td>
             </tr>
           `
         )
@@ -449,7 +448,7 @@ function renderProducts() {
     const stock = Number(row.current_stock);
     const low = stock <= Number(row.low_stock_level);
     const label = stock < 0 ? `${formatQty(Math.abs(stock))} বস্তা ঘাটতি` : `${formatQty(stock)} বস্তা আছে`;
-    return `<tr><td><div class="stock-product"><div class="stock-product-heading"><div class="stock-product-details"><strong>${recordText(row.name)}</strong><span class="row-date product-category">${productCategoryLabel(row)}</span><div class="stock-product-badges"><span class="pill ${low ? "danger" : ""}">${label}</span>${row.pending ? '<span class="pill warning">Pending Sync</span>' : ""}${row.stock_conflict ? '<span class="pill danger">Review Stock Sync</span>' : ""}</div></div><button type="button" class="button secondary" data-product-edit="${row.id}" aria-label="Edit ${escapeHtml(row.name)}">${icon("edit")}Edit</button></div></div></td>
+    return `<tr><td><div class="stock-product"><div class="stock-product-heading"><div class="stock-product-details"><strong>${recordText(row.name)}</strong><span class="row-date product-category">${productCategoryLabel(row)}</span><div class="stock-product-badges"><span class="pill ${low ? "danger" : ""}">${label}</span>${row.pending ? '<span class="pill warning">Pending Sync</span>' : ""}${row.stock_conflict ? '<span class="pill danger">Review Stock Sync</span>' : ""}</div></div><button type="button" class="button secondary" data-product-edit="${row.id}" aria-label="Edit ${escapeHtml(row.name)}">${icon("edit")}Edit</button>${deleteButton("products",row.id)}</div></div></td>
       <td>${recordText(row.product_code)}</td><td class="number">${formatQty(row.opening_stock)}</td>
       <td class="number">${formatQty(row.received_stock)}</td><td class="number">${formatQty(row.sold_stock)}</td>
       <td class="number">${formatQty(stock)}</td><td class="number">${formatQty(row.low_stock_level)}</td></tr>`;
@@ -487,7 +486,7 @@ function renderMoney() {
               <td>${recordText(row.customer_name)}</td>
               <td class="number">${formatMoney(row.amount)}</td>
               <td>${row.account}</td>
-              <td>${deleteButton("payments", row.id)}</td>
+              <td><div class="row-actions">${editButton("payments", row.id)}${deleteButton("payments", row.id)}</div></td>
             </tr>
           `
         )
@@ -503,7 +502,7 @@ function renderMoney() {
               <td>${row.type}</td>
               <td class="number">${formatMoney(row.amount)}</td>
               <td>${row.account}</td>
-              <td>${deleteButton("transactions", row.id)}</td>
+              <td><div class="row-actions">${editButton("transactions", row.id)}${deleteButton("transactions", row.id)}</div></td>
             </tr>
           `
         )
@@ -598,6 +597,7 @@ function renderAll() {
   setSyncState("ready");
   window.AdvancedWorkspace?.render();
   window.CustomerDues?.render();
+  window.RecordEditor?.render();
 }
 
 function formPayload(form) {
@@ -823,7 +823,7 @@ function renderSearchResults() {
 function syncTransferForm(form) {
   const type=form.elements.type.value,transfer=['Bank Deposit','Bank Withdraw'].includes(type);
   const account=form.elements.account;account.disabled=transfer;
-  if(transfer)account.value=type==='Bank Deposit'?'Cash':'Bank';
+  if(transfer){account.value=type==='Bank Deposit'?'Cash':'Bank';form.dataset.transferAccount='derived';}else if(form.dataset.transferAccount==='derived'){account.value='';delete form.dataset.transferAccount;}
   const hint=form.querySelector('[data-transfer-hint]');
   if(hint){hint.hidden=!transfer;hint.innerHTML=transfer?`<span>${type==='Bank Deposit'?'Cash → Bank':'Bank → Cash'}</span><span> · </span><span>Both accounts update together.</span>`:'';window.AppI18n?.apply(hint);}
 }
@@ -941,7 +941,7 @@ function bindEvents() {
 }
 
 // Shared with the classic scripts usability.js and advanced.js.
-Object.assign(globalThis, { productSpecifications, resetNavigationHistory });
+Object.assign(globalThis, { productSpecifications, resetNavigationHistory, findProduct });
 
 bindEvents();
 load().catch((error) => toast(error.message));

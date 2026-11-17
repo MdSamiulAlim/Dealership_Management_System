@@ -1,4 +1,4 @@
-import {allocateCents} from '../public/money-allocation.mjs';
+import {allocateCents,percentageDiscountCents} from '../public/money-allocation.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {randomUUID} from 'node:crypto';
@@ -57,8 +57,8 @@ test('old invoice edits and returns continue working for archived products witho
 
 test('offline projections include archived accounts and reject new archived-product sales',async()=>{
  const f=await fixture();try{
-  const source=readFileSync(new URL('../public/offline-store.js',import.meta.url),'utf8').replace('let journalReports=null,shares=null','let journalReports=null,shares=testShares').replace('window.WorkspaceStore={','window.ArchiveTest={protectHistoryAndStock,apply,recalculate};window.WorkspaceStore={');
-  const context=vm.createContext({testShares:allocateCents,window:{addEventListener(){}},navigator:{},localStorage:{getItem(){return null}},structuredClone,Intl,setInterval(){}});vm.runInContext(source,context);
+  const source=readFileSync(new URL('../public/offline-store.js',import.meta.url),'utf8').replace('let journalReports=null,shares=null,percentageDiscount=null','let journalReports=null,shares=testShares,percentageDiscount=testPercentage').replace('window.WorkspaceStore={','window.ArchiveTest={protectHistoryAndStock,apply,recalculate};window.WorkspaceStore={');
+  const context=vm.createContext({testShares:allocateCents,testPercentage:percentageDiscountCents,window:{addEventListener(){}},navigator:{},localStorage:{getItem(){return null}},structuredClone,Intl,setInterval(){}});vm.runInContext(source,context);
   const api=context.window.ArchiveTest,s=structuredClone(f.after);
   assert.throws(()=>api.protectHistoryAndStock(s,cmd('POST','/api/invoices',{items:[{product_id:f.product.id,quantity:1,rate:100}]})),/archived/);
   const invoice=s.invoices[0],op=cmd('POST',`/api/invoices/${invoice.id}/return`,{confirmed:true,expected_version:invoice.version,return_date:'2026-10-22',reason:'Offline return',items:[{id:invoice.items[0].id,quantity:1}]});

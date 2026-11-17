@@ -2,6 +2,18 @@ import 'dart:math' as math;
 import 'types.dart';
 
 class Ledger {
+  static int percentageDiscountCents(int subtotal, int basisPoints) {
+    if (subtotal < 0 || basisPoints < 0 || basisPoints > 10000) {
+      throw const AppFailure('Check the discount and paid amount.');
+    }
+    // Both operands are already normalized integers. Keep the product exact
+    // until the final half-up division to avoid binary floating-point ties.
+    return ((BigInt.from(subtotal) * BigInt.from(basisPoints) +
+                BigInt.from(5000)) ~/
+            BigInt.from(10000))
+        .toInt();
+  }
+
   static List<int> allocate(int total, List<int> weights) {
     if (total < 0 || weights.any((w) => w < 0)) {
       throw const AppFailure('Allocation amounts cannot be negative.');
@@ -104,7 +116,7 @@ class Ledger {
       throw const AppFailure('Check the discount and paid amount.');
     }
     final discount = type == 'percent'
-        ? ((subtotal * value / 100) + .5).floor()
+        ? percentageDiscountCents(subtotal, cents(value))
         : cents(value);
     final total = subtotal - discount,
         paid = cents(inputMoney(payload['paid_amount'] ?? 0));
@@ -220,7 +232,10 @@ class Ledger {
         inputMoney(p['bag_weight'] ?? 50, positive: true);
         calculatedTotal(p, inputMoney(number(p['quantity']) * rate));
         final product = find(allProducts(base), p['product_id']);
-        if (product == null || flag(product['archived'])) {
+        final old = method == 'PATCH' ? find(rows(base, entity), id) : null;
+        if (product == null ||
+            (flag(product['archived']) &&
+                !same(old?['product_id'], p['product_id']))) {
           throw const AppFailure('Choose a current product.');
         }
       }
@@ -447,6 +462,82 @@ class Ledger {
       if (used) {
         throw const AppFailure(
           'This record has transactions and cannot be deleted. Keep it for the account history.',
+        );
+      }
+    }
+    if (method == 'PATCH' && ['orders', 'adjustments'].contains(entity)) {
+      final old = find(rows(base, entity), id);
+      if (old == null) throw const AppFailure('Record not found.');
+      if (p['confirmed'] != true) {
+        throw const AppFailure('Confirm the stock change first.');
+      }
+      final next = {...old, ...p};
+      bags(next['quantity'], minimum: 1);
+      double effect(Json r) => entity == 'orders'
+          ? (r['status'] == 'Delivered' ? number(r['quantity']) : 0)
+          : (['Return', 'Manual Add'].contains(r['type']) ? 1 : -1) *
+                number(r['quantity']);
+      final product = find(allProducts(base), next['product_id']);
+      if (product == null ||
+          (flag(product['archived']) &&
+              !same(old['product_id'], next['product_id']))) {
+        throw const AppFailure('Choose a current product.');
+      }
+      for (final feed in allProducts(base).where(
+        (r) =>
+            same(r['id'], old['product_id']) ||
+            same(r['id'], next['product_id']),
+      )) {
+        final delta =
+            (same(feed['id'], next['product_id']) ? effect(next) : 0) -
+            (same(feed['id'], old['product_id']) ? effect(old) : 0);
+        if (delta < 0 && stock(base, feed) + delta < 0) failStock();
+      }
+      if (entity == 'adjustments' && text(p['notes']).trim().isEmpty) {
+        throw const AppFailure('Enter a stock adjustment reason.');
+      }
+    }
+    if (entity == 'transactions' && method == 'PATCH') {
+      final old = find(rows(base, entity), id);
+      if (old == null) throw const AppFailure('Record not found.');
+      final transfer = ['Bank Deposit', 'Bank Withdraw'].contains(p['type']);
+      if (old['transfer_id'] != null) {
+        final pair = rows(base, entity)
+            .where(
+              (r) =>
+                  r['transfer_id'] == old['transfer_id'] && !same(r['id'], id),
+            )
+            .toList();
+        if (!transfer || p['confirmed'] != true) {
+          throw const AppFailure(
+            'Confirm the transfer edit. Keep it as Cash to Bank or Bank to Cash.',
+          );
+        }
+        if (pair.length != 1 ||
+            p['original_transfer'] is! Map ||
+            pair.single['account'] == old['account']) {
+          throw const AppFailure(
+            'Reload the complete transfer before editing.',
+          );
+        }
+        final expected = object(p['original_transfer']);
+        if (pair.single.entries.any(
+          (e) =>
+              ![
+                'pending',
+                'original',
+                'original_transfer',
+                'confirmed',
+              ].contains(e.key) &&
+              expected[e.key] != e.value,
+        )) {
+          throw const AppFailure(
+            'Transfer changed on another device. Refresh first.',
+          );
+        }
+      } else if (transfer) {
+        throw const AppFailure(
+          'Create a new transfer instead of changing a single transaction into a transfer.',
         );
       }
     }
@@ -778,7 +869,25 @@ class Ledger {
           }
         }
       }
-      list[index] = {...row, ...p, 'pending': true};
+      if (entity == 'orders') {
+        p['total_amount'] = money(number(p['quantity']) * number(p['rate']));
+      }
+      if (entity == 'transactions' && row['transfer_id'] != null) {
+        for (var i = 0; i < list.length; i++) {
+          final side = object(list[i]);
+          if (side['transfer_id'] != row['transfer_id']) continue;
+          list[i] = {
+            ...side,
+            ...p,
+            'id': side['id'],
+            'account': side['account'],
+            'transfer_id': side['transfer_id'],
+            'pending': true,
+          };
+        }
+      } else {
+        list[index] = {...row, ...p, 'pending': true};
+      }
     }
   }
 

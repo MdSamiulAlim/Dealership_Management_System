@@ -1,87 +1,56 @@
-# Dependency security review — 23 October 2026 (Asia/Dhaka)
+# Dependency security review — 17 November 2026 (Asia/Dhaka)
 
-The production audit initially reported five vulnerable packages: one critical,
-two high and two moderate. After compatible updates, `npm audit --omit=dev`
-reports **zero** findings. The complete tree went from 30 package findings
-(1 critical, 21 high, 7 moderate, 1 low) to **8 high development findings**
-from one remaining `braces` advisory chain. Package counts are not counts of
-independent vulnerabilities or evidence of an exploited application.
+Fresh npm audits of the installed, locked dependency tree report **zero findings**
+for both production and the complete development/build tree. Before this update,
+production had one moderate package finding and the whole tree had eight moderate
+package findings from two advisory chains. Package counts do not establish that
+this application has been exploited.
 
-Machine-readable evidence is in `security/audit-production-before.json`,
-`security/audit-production-after.json`, `security/audit-all-before.json`, and
-`security/audit-all-after.json`.
+## Compatible updates
 
-## Original production findings and exposure
+| Package | Before → after | Purpose |
+| --- | --- | --- |
+| Next.js | 16.4.2 → 16.4.6 | Patched cache/root-param disclosure advisory |
+| eslint-config-next | 16.4.2 → 16.4.6 | Keep the Next lint configuration aligned |
+| typescript-eslint and its parser/plugin/utils chain | 8.59.3 → 8.73.0 | Upstream-compatible patched glob dependency |
+| minimatch under the TypeScript lint chain | 10.2.5 → 11.0.9 | Patched pattern amplification advisory |
 
-| Package | Before → after | Exposure assessment from app source | Advisory |
-| --- | --- | --- | --- |
-| next | 16.3.4 → 16.4.2 | The hosted app runs the compiled Vinext Worker, not a Node Next server. No app route imports `next/og`, generates attacker-controlled SVG via ImageResponse, uses `use cache`, or declares Server Actions. The lack of these app-level paths reduces exposure to the corresponding advisories; it is not a general proof of non-exploitability. Update applied regardless. | [Next ImageResponse](https://github.com/advisories/GHSA-vcvr-r3jv-pc5j), plus the Next advisories recorded in the before audit |
-| sharp | 0.35.4 → 0.35.5 | App receipts use pdf-lib/fontkit; supplied logos are static assets. No business route accepts arbitrary SVG for a Sharp conversion. Sharp is still a declared production dependency, so its librsvg fix is retained. | [librsvg](https://github.com/advisories/GHSA-wq5f-xc86-pv6w) |
-| source-map-js | 1.2.1 → 1.2.2 | Used by CSS/source-map tooling. No app route accepts user-supplied source maps for parsing. Source maps used during builds come from project dependencies and source. | [Indexed source-map offsets](https://github.com/advisories/GHSA-68fv-2mgg-jv7q) |
-| baseline-browser-mapping | 2.10.30 → 2.11.31 | Browser target selection is build configuration, not a business API input. No app endpoint passes request values into this package. | [Invalid-input termination](https://github.com/advisories/GHSA-w5vr-8v7q-w6rv) |
-| fast-uri | 3.1.7 → 3.1.9 | Transitive URI/schema tooling. App authentication, trusted origins and Android download host checks use native URL parsing; they do not use fast-uri host normalization. | [URI normalization](https://github.com/advisories/GHSA-hrr3-gc8f-f4qj) |
+The TypeScript ESLint update itself declares `minimatch ^11.0.1`. This is its
+supported dependency range, rather than a forced major override. Other users of
+unaffected minimatch 3.1.5 remain unchanged. Node 24.13.0, ESLint 9.39.4 and
+TypeScript 5.9.3 meet the updated packages' engine/peer requirements. The dependency
+tree check has no problems. Existing unrelated overrides are retained; no
+`--force`, framework major upgrade, audit downgrade or advisory suppression was used.
 
-This is a source/dependency exposure review and regression verification, not a
-production penetration test or a claim that exploitation has occurred.
+## Exposure assessment
 
-## Additional compatible updates
+- [GHSA-mfr8-8qww-v76h](https://github.com/advisories/GHSA-mfr8-8qww-v76h)
+  affects Next 16.3.0 through 16.4.4 and is patched from 16.4.5. It requires a
+  particular combination of `use cache`, `unstable_cache()` and root params.
+  The app source has no such cache directives/calls, and hosting uses the compiled
+  Vinext Worker. This reduces the observed exposure; it is not a proof of general
+  non-exploitability. The patch is applied regardless.
+- [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249)
+  affects minimatch 7 through versions before 11.0.1. The affected installed path
+  was the development lint/parser chain. Business APIs do not feed request values
+  into glob expansion, and the deployed site does not run an ESLint/Vite dev
+  server. Processing untrusted source/glob patterns remains a development concern;
+  its compatible upstream update is now installed.
 
-React, React DOM and react-server-dom-webpack now match at 19.2.9. The RSC
-transport is relevant to the Vinext app, even though npm classifies its direct
-package as development. [The Server Functions advisory](https://github.com/advisories/GHSA-wx67-qw84-cm4g)
-is therefore addressed, rather than relying only on the production audit.
+## Evidence and validation
 
-Vite is 8.3.5, eslint-config-next 16.4.2 and drizzle-kit 0.31.11. Tested,
-explicit transitive overrides supply image-size 2.0.4, ws 8.21.0, Undici 7.29.1,
-Sharp 0.35.5 under Miniflare, esbuild 0.25.12 under the legacy Drizzle loader,
-and esbuild 0.28.2 under Wrangler. Remaining permitted transitive fixes were
-applied with `npm audit fix`, without `--force`. No framework major upgrade or
-npm-recommended downgrade was used.
+The dated reports in `security/audit-2026-11-17-*-before.json` and
+`security/audit-2026-11-17-*-after.json` retain production/full audit results.
+`npm audit --omit=dev --json` and `npm audit --json` both report total 0 after
+installation from the updated lockfile. Strict lint uses `npm run lint --
+--max-warnings=0`; the shared cross-file product lookup remains in place.
 
-## Remaining development advisory
+The full test/build, TypeScript, browser and built-Worker HTTP/security results
+are retained with this release's verification evidence. They exercise disposable
+records, not the live dealership database. No password, role policy, product
+catalog/schema or historical invoice migration is part of this update.
 
-[GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
-affects braces through 3.0.3; the advisory currently lists no patched release.
-The eight npm findings propagate through braces, micromatch, fast-glob,
-@next/eslint-plugin-next, eslint-config-next, vite-plugin-dynamic-import,
-vite-plugin-commonjs and vinext. They are development/build dependency paths,
-not eight independent confirmed application exploits.
-
-The observable imports are the ESLint root-directory glob helper and Vite's
-build-time dynamic-import glob handling. Inputs here are repository file/glob
-patterns. Business API values are not passed into glob expansion, and the
-published app serves a compiled Worker rather than a Vite/ESLint server. The
-remaining attack surface is processing untrusted project files or patterns in
-the development/build workflow. This dependency is not treated as fixed.
-
-npm's forced fix proposes downgrading eslint-config-next to 14.2.35 and Vinext
-to 0.0.15. Those changes are incompatible with this application's framework
-baseline. Keep the finding tracked until a patched compatible dependency is
-available; do not suppress it or falsely report a clean full-tree audit.
-
-## Verification
-
-- The production audit reports zero findings; the full-tree audit retains the
-  eight development findings documented above.
-- Local Python: 17 production-route/database tests passed, including balanced
-  transfers in both directions, paired deletion, atomic rollback on counterpart
-  failure, and the upgrade of an actual old schema without a transfer column.
-- Hosted app: all 16 Node test files passed; lint has zero errors/warnings;
-  TypeScript passed; upgraded Drizzle generated no schema changes.
-- The production build and built-Worker HTTP regression passed, including
-  login/logout, 40 concurrent wrong logins (30 limited), balanced transfers,
-  idempotent payment retry, stock/validation protections and invoice/PDF output.
-- Build/HTTP verification commands: `node <Sites plugin>/scripts/build-site.mjs`
-  and `python3 tests/built_login.py --runs 1` (disposable credentials/database).
-
-## Recheck for the remaining eight findings
-
-On 23 October 2026, fresh registry audits again report zero production findings
-and eight high package-level development findings. `npm view braces version`
-still returns 3.0.3; the primary GitHub advisory still lists patched versions as
-None. No package downgrade, audit suppression or unreviewed replacement of the
-glob engine is applied. The application never accepts user glob patterns; build
-and lint should process trusted repository inputs only. This limits exposure
-but does not resolve or remove the advisory. Updated raw audit results replace
-the `*-after.json` evidence files. Recheck the upstream advisory before the next
-dependency update.
+Older dated audit JSON files remain as historical evidence. Their former findings
+and package versions describe those dates, not the current installed tree. A
+clean audit is a point-in-time advisory check, not a penetration test or proof
+that an application has no possible vulnerabilities.

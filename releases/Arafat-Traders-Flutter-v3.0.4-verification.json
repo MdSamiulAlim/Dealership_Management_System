@@ -1,0 +1,86 @@
+{
+  "version": "3.0.4",
+  "version_code": 10,
+  "package": "com.samiul.akijdealership",
+  "min_android_api": 24,
+  "certificate_sha256": "b70b254f801f3b545d167384dc36177eee4d6c727cbbfc1c245b50b199ca4b7e",
+  "physical_device_tested": false,
+  "artifacts": [
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.4-arm64.apk",
+      "abi": "arm64-v8a",
+      "bytes": 26236094,
+      "sha256": "5dac35d2cf124933fef45360dda3a81103ac4e3e0f67a51d70911a917d5477a6",
+      "signature_verified": true,
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": [
+        {
+          "path": "lib/arm64-v8a/libapp.so",
+          "minimum_load_alignment": 65536
+        },
+        {
+          "path": "lib/arm64-v8a/libdartjni.so",
+          "minimum_load_alignment": 16384
+        },
+        {
+          "path": "lib/arm64-v8a/libflutter.so",
+          "minimum_load_alignment": 65536
+        }
+      ],
+      "compiled_dart_sha256": "fff3f22fbab42ab19d2d428366168dcf3d474a9d80d5346990c6cf0c0b6bf6bd",
+      "aot_output_sha256": "c54e1ef1520f82dbc4e9d02af8737e3c5cc6abb5c74c246a5abfcc52a1f08864",
+      "aot_merge_and_stripped_apk_chain_verified": true
+    },
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.4-armv7.apk",
+      "abi": "armeabi-v7a",
+      "bytes": 24278040,
+      "sha256": "3b22c4a1f4cccef7eabda92c605315f072b1087cedb4fc5270e94290c6958407",
+      "signature_verified": true,
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": [],
+      "compiled_dart_sha256": "3fe3369de2e56f2c1ebc5bbd71083e15102e6dba3c54a8b5634d380dc396636d",
+      "aot_output_sha256": "97f8251c6545adb121818291d9b68313804afbd39267e1cca36b4b6f75b17383",
+      "aot_merge_and_stripped_apk_chain_verified": true
+    },
+    {
+      "file": "Arafat-Traders-Flutter-v3.0.4-x86_64.apk",
+      "abi": "x86_64",
+      "bytes": 27727557,
+      "sha256": "353e9b2cd7cea815d7b7ec420aef703efbe1a056ba4fd5ee433422e8f3622b3e",
+      "signature_verified": true,
+      "zip_16kb_alignment": true,
+      "elf_64bit_libraries": [
+        {
+          "path": "lib/x86_64/libapp.so",
+          "minimum_load_alignment": 65536
+        },
+        {
+          "path": "lib/x86_64/libdartjni.so",
+          "minimum_load_alignment": 16384
+        },
+        {
+          "path": "lib/x86_64/libflutter.so",
+          "minimum_load_alignment": 65536
+        }
+      ],
+      "compiled_dart_sha256": "2ffb4002e34b3ec89a6243dffd91d9d9adb525d77d32554fa6a010c363f43a63",
+      "aot_output_sha256": "2445e7ab7603a86f4b5c06dcd122c5f09fbaec70438c7e766bb5f38a5a6cf7a9",
+      "aot_merge_and_stripped_apk_chain_verified": true
+    }
+  ],
+  "source_sha256": "87a3dcbae88d3799e2c0a50cf12fc1eb32650e34af6a747094b63030520d6709",
+  "pubspec_lock_sha256": "cffe12c4b17a3ba18cf9ba61ef2315cb3ef2a0569436d0602a4244969c55e624",
+  "analyzer": "No issues found",
+  "tests_passed": 159,
+  "test_provenance": "159 Flutter tests and clean analysis from the immediately preceding fix verification; Dart files and locked dependencies unchanged. Only release version metadata and packaging verification/docs changed.",
+  "percentage_regression": {
+    "subtotal": 50,
+    "percent": 0.57,
+    "discount": 0.29,
+    "total": 49.71
+  },
+  "canonical_api_origin": "https://akij-dealership-sami.subscription-cellosc.chatgpt.site",
+  "baseline_version": "3.0.3+9",
+  "updated_at": "2026-11-17"
+}

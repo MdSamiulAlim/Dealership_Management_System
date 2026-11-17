@@ -1,0 +1,140 @@
+[
+  {
+    "rates": [
+      "50"
+    ],
+    "percent": "0.57",
+    "discount_cents": 29,
+    "total_cents": 4971
+  },
+  {
+    "rates": [
+      "50"
+    ],
+    "percent": "0.29",
+    "discount_cents": 15,
+    "total_cents": 4985
+  },
+  {
+    "rates": [
+      "50"
+    ],
+    "percent": "0.01",
+    "discount_cents": 1,
+    "total_cents": 4999
+  },
+  {
+    "rates": [
+      "1"
+    ],
+    "percent": "0.50",
+    "discount_cents": 1,
+    "total_cents": 99
+  },
+  {
+    "rates": [
+      "1"
+    ],
+    "percent": "28.50",
+    "discount_cents": 29,
+    "total_cents": 71
+  },
+  {
+    "rates": [
+      "0.01"
+    ],
+    "percent": "50",
+    "discount_cents": 1,
+    "total_cents": 0
+  },
+  {
+    "rates": [
+      "0.03"
+    ],
+    "percent": "50",
+    "discount_cents": 2,
+    "total_cents": 1
+  },
+  {
+    "rates": [
+      "0.03"
+    ],
+    "percent": "49.99",
+    "discount_cents": 1,
+    "total_cents": 2
+  },
+  {
+    "rates": [
+      "0.03"
+    ],
+    "percent": "50.01",
+    "discount_cents": 2,
+    "total_cents": 1
+  },
+  {
+    "rates": [
+      "2.51"
+    ],
+    "percent": "50",
+    "discount_cents": 126,
+    "total_cents": 125
+  },
+  {
+    "rates": [
+      "50",
+      "50"
+    ],
+    "percent": "0.57",
+    "discount_cents": 57,
+    "total_cents": 9943
+  },
+  {
+    "rates": [
+      "0.01",
+      "0.02"
+    ],
+    "percent": "50",
+    "discount_cents": 2,
+    "total_cents": 1
+  },
+  {
+    "rates": [
+      "1000000000000"
+    ],
+    "percent": "99.99",
+    "discount_cents": 99990000000000,
+    "total_cents": 10000000000
+  },
+  {
+    "rates": [
+      "999999999999.99"
+    ],
+    "percent": "0.57",
+    "discount_cents": 570000000000,
+    "total_cents": 99429999999999
+  },
+  {
+    "rates": [
+      "50"
+    ],
+    "percent": "100",
+    "discount_cents": 5000,
+    "total_cents": 0
+  },
+  {
+    "rates": [
+      "0"
+    ],
+    "percent": "100",
+    "discount_cents": 0,
+    "total_cents": 0
+  },
+  {
+    "rates": [
+      "50"
+    ],
+    "percent": "0",
+    "discount_cents": 0,
+    "total_cents": 5000
+  }
+]

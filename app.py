@@ -981,6 +981,79 @@ def delete_transaction(conn: sqlite3.Connection, record_id: int) -> None:
         conn.execute("DELETE FROM transactions WHERE id=?", (record_id,))
 
 
+def update_record(conn: sqlite3.Connection, entity: str, record_id: int, payload: dict[str, Any]) -> None:
+    table = DELETE_TABLES[entity]
+    row = conn.execute(f"SELECT * FROM {table} WHERE id=?", (record_id,)).fetchone()
+    if row is None:
+        raise InputError("Record not found", 404)
+    original = payload.get("original")
+    if not isinstance(original, dict) or any(key not in original for key in row):
+        raise InputError("Reload the complete record before editing.", 409)
+    if any(original[key] != row[key] for key in row):
+        raise InputError("This record changed on another device. Refresh first.", 409)
+    p = {**dict(row), **payload}
+    if len(clean_text(p.get("notes"))) > 1000:
+        raise InputError("Keep the note within 1000 characters.")
+    condition = " AND ".join(f"{key} IS ?" for key in row)
+    args = [original[key] for key in row]
+    if entity == "customers":
+        if "opening_due" in payload or "current_due" in payload:
+            raise InputError("Use customer payments to change account balances.")
+        require_fields(p, ["name"])
+        fields = {key: clean_text(p.get(key)) for key in ("name", "mobile", "address")}
+        if len(fields["name"]) > 200 or len(fields["mobile"]) > 50 or len(fields["address"]) > 1000:
+            raise InputError("Customer fields exceed their length limits.")
+    elif entity in ("orders", "sales"):
+        quantity = whole_bags(p["quantity"])
+        rate = nonnegative(p["rate"], "Rate")
+        total = calculated_total(payload, money(quantity * rate))
+        fields = {"product_id": whole_bags(p["product_id"], "Product"), "quantity": quantity, "rate": rate, "total_amount": total, "notes": clean_text(p.get("notes"))}
+        if entity == "orders":
+            if payload.get("confirmed") is not True:
+                raise InputError("Confirm the stock change first.")
+            fields.update(order_date=valid_date(p["order_date"]), bag_weight=positive(p["bag_weight"], "Bag weight"), status=choice(p["status"], ("Pending", "Confirmed", "Delivered")), delivery_date=valid_date(p.get("delivery_date"), True), invoice_no=clean_text(p.get("invoice_no")))
+        else:
+            paid = nonnegative(p["paid_amount"], "Paid amount")
+            if paid > total:
+                raise InputError("Paid amount cannot exceed the sale total.")
+            fields.update(sale_date=valid_date(p["sale_date"]), customer_id=whole_bags(p["customer_id"], "Customer"), paid_amount=paid, account=choice(p["account"], ("Cash", "Bank")))
+    elif entity == "payments":
+        if whole_bags(p["customer_id"], "Customer") != row["customer_id"]:
+            raise InputError("A collection must stay with its original customer.")
+        fields = dict(payment_date=valid_date(p["payment_date"]), amount=positive(p["amount"]), account=choice(p["account"], ("Cash", "Bank")), notes=clean_text(p.get("notes")))
+    elif entity == "adjustments":
+        if payload.get("confirmed") is not True:
+            raise InputError("Confirm the stock change first.")
+        require_fields(p, ["notes"])
+        fields = dict(adjust_date=valid_date(p["adjust_date"]), product_id=whole_bags(p["product_id"], "Product"), type=choice(p["type"], ("Return", "Damage", "Loss", "Manual Add", "Manual Minus")), quantity=whole_bags(p["quantity"]), notes=clean_text(p["notes"]))
+    elif entity == "transactions":
+        fields = dict(txn_date=valid_date(p["txn_date"]), type=choice(p["type"], ("Company Payment", "Expense", "Transport Cost", "Other Income", "Other Expense", "Bank Deposit", "Bank Withdraw")), amount=positive(p["amount"]), notes=clean_text(p.get("notes")))
+        transfer = fields["type"] in ("Bank Deposit", "Bank Withdraw")
+        if row["transfer_id"]:
+            if not transfer or payload.get("confirmed") is not True:
+                raise InputError("Confirm the transfer edit. Keep it as Cash to Bank or Bank to Cash.")
+            pairs = conn.execute("SELECT * FROM transactions WHERE transfer_id=? AND id<>?", (row["transfer_id"], record_id)).fetchall()
+            partner = payload.get("original_transfer")
+            if len(pairs) != 1 or not isinstance(partner, dict) or any(key not in partner for key in pairs[0]) or partner.get("id") != pairs[0]["id"] or row["account"] == pairs[0]["account"]:
+                raise InputError("Reload the complete transfer before editing.", 409)
+            partner_condition = " AND ".join(f"{key} IS ?" for key in pairs[0])
+            pair_args = [partner[key] for key in pairs[0]]
+            assignments = ",".join(f"{key}=?" for key in fields)
+            conn.execute(f"WITH matched AS MATERIALIZED (SELECT transfer_id FROM transactions WHERE {condition} AND EXISTS(SELECT 1 FROM transactions WHERE {partner_condition})) UPDATE transactions SET {assignments} WHERE transfer_id IN (SELECT transfer_id FROM matched)", (*args, *pair_args, *fields.values()))
+            if conn.execute("SELECT changes() AS changed").fetchone()["changed"] != 2:
+                raise InputError("Transfer changed on another device. Refresh first.", 409)
+            return
+        if transfer:
+            raise InputError("Create a new transfer instead of changing a single transaction into a transfer.")
+        fields["account"] = choice(p["account"], ("Cash", "Bank"))
+    else:
+        raise InputError("Unsupported edit", 404)
+    assignments = ",".join(f"{key}=?" for key in fields)
+    cursor = conn.execute(f"UPDATE {table} SET {assignments} WHERE {condition}", (*fields.values(), *args))
+    if not cursor.rowcount:
+        raise InputError("This record changed on another device. Refresh first.", 409)
+
+
 INSERT_HANDLERS = {
     "products": insert_product,
     "customers": insert_customer,
@@ -1126,6 +1199,16 @@ class AppRoutes:
             return
         parsed = urlparse(self.path)
         parts = parsed.path.strip("/").split("/")
+        if len(parts) == 3 and parts[0] == "api" and parts[1] in DELETE_TABLES and parts[1] != "products":
+            try:
+                record_id = whole_bags(parts[2], "Record")
+                payload = self.read_json()
+                with db() as conn:
+                    update_record(conn, parts[1], record_id, payload)
+                self.json_response(200, bootstrap())
+            except (ValueError, sqlite3.Error, json.JSONDecodeError) as exc:
+                self.json_response(error_status(exc), {"error": error_message(exc)})
+            return
         if len(parts) == 3 and parts[0] == "api" and parts[1] == "products":
             try:
                 record_id = whole_bags(parts[2], "Product")

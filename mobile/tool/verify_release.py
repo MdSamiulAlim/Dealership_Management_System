@@ -11,7 +11,7 @@ bin=sdk/'build-tools/36.0.0'
 release=root/'releases'
 evidence=release/f'flutter-v{version}-build-evidence'
 evidence.mkdir(parents=True,exist_ok=True)
-baseline=json.loads((release/'Arafat-Traders-Flutter-v3.0.2-verification.json').read_text())
+baseline=json.loads((release/'Arafat-Traders-Flutter-v3.0.3-verification.json').read_text())
 certificate=baseline['certificate_sha256']
 assert code>baseline['version_code']
 report={'version':version,'version_code':code,'package':'com.samiul.akijdealership','min_android_api':24,'certificate_sha256':certificate,'physical_device_tested':False,'artifacts':[]}

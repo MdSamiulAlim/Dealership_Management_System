@@ -1,0 +1,20 @@
+{
+  "prepared_date": "2026-11-03",
+  "remote": "https://github.com/MdSamiulAlim/Dealership_Management_System.git",
+  "branch": "main",
+  "commit": "f72ee0308868b4d485ee63629a1efbaa6f5e1120",
+  "tracked_files": 337,
+  "pushed": false,
+  "push_mode": "user elected to push from own computer",
+  "original_source_unchanged": true,
+  "prepared_worktree_clean": true,
+  "web_source_worktree_clean": true,
+  "copied_source_hash_verification": "passed",
+  "sensitive_paths_ignore_verification": "passed",
+  "secrets_scan": "passed",
+  "python_tests_passed": 20,
+  "web_flutter_tests": "not rerun for source-only packaging; runtime code copied byte-for-byte",
+  "zip": "Arafat-Traders-Full-Project-GitHub-2026-11-03.zip",
+  "zip_bytes": 12645554,
+  "zip_sha256": "b06314dd5a234cbfb9141c0fd072c201c5a9377bfa07b2d53f8312ba348ab2e9"
+}

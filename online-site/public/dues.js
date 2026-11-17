@@ -5,7 +5,6 @@
  const q=(s,root=document)=>root.querySelector(s),qa=(s,root=document)=>[...root.querySelectorAll(s)];
  const t=value=>i18n.text(value),html=escapeHtml,record=recordText;
  const ctx={customerId:null,editing:false,payment:null,commandId:null,busy:false,dirty:false};
- const localDate=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const date=value=>value?new Intl.DateTimeFormat(i18n.language==='bn'?'bn-BD':'en-GB',{timeZone:'Asia/Dhaka',year:'numeric',month:'short',day:'2-digit'}).format(new Date(value+'T00:00:00+06:00')):'—';
  const lookup=id=>state.customers.find(c=>String(c.id)===String(store.resolveId(id)));
  const statement=id=>customerDueStatement(lookup(id),state.invoices||[],state.payments||[],state.returns||[]);
@@ -26,8 +25,8 @@
  function ledgerMarkup(s,editing=false,print=false){
   const rowActions=entry=>{
    if(!editing||print)return '';
-   if(entry.kind==='payment')return `<button type="button" class="button secondary" data-due-payment-edit="${entry.id}">${t('Edit Collection')}</button>`;
-   if(entry.kind==='invoice'){const inv=s.invoices.find(i=>String(i.id)===String(entry.id)),locked=inv?.status==='void'||inv?.items?.some(i=>Number(i.returned_quantity)>0)||Number(inv?.returned_total)>0;return `<div class="row-actions"><button type="button" class="button secondary" data-due-invoice-view="${entry.id}">${t('View Invoice')}</button><button type="button" class="button secondary" data-due-invoice-edit="${entry.id}" ${locked?'disabled':''}>${t('Edit Invoice')}</button></div>`;}
+   if(entry.kind==='payment')return `<button type="button" class="button secondary" data-due-payment-edit="${entry.id}">${t('Edit Collection')}</button>${deleteButton("payments",entry.id)}`;
+   if(entry.kind==='invoice'){const inv=s.invoices.find(i=>String(i.id)===String(entry.id)),locked=inv?.status==='void'||inv?.items?.some(i=>Number(i.returned_quantity)>0)||Number(inv?.returned_total)>0;return `<div class="row-actions"><button type="button" class="button secondary" data-due-invoice-view="${entry.id}">${t('View Invoice')}</button><button type="button" class="button secondary" data-due-invoice-edit="${entry.id}" ${locked?'disabled':''}>${t('Edit Invoice')}</button><button type="button" class="danger" data-invoice-delete="${entry.id}" ${inv?.status==='void'||inv?.pending?'disabled':''}>${t('Delete')}</button></div>`;}
    return `<button type="button" class="button secondary" data-due-invoice-view="${entry.invoice_id}">${t('View Invoice')}</button>`;
   };
   return `<div class="table-wrap"><table class="due-history"><thead><tr><th>${t('Date / Reference')}</th><th>${t('Entry')}</th><th class="number">${t('Charge / Refund')}</th><th class="number">${t('Paid / Credit')}</th><th class="number">${t('Balance')}</th>${editing&&!print?`<th>${t('Actions')}</th>`:''}</tr></thead><tbody><tr><td data-label="Date / Reference">—</td><td data-label="Entry">${t('Opening balance')}</td>${amountCell('Charge / Refund',Math.max(0,s.opening_balance))}${amountCell('Paid / Credit',Math.max(0,-s.opening_balance))}${amountCell('Balance',s.opening_balance)}${editing&&!print?'<td></td>':''}</tr>${s.entries.map(e=>`<tr><td data-label="Date / Reference">${date(e.date)}<span class="row-date">${record(e.reference||t('Pending Sync'))}</span></td><td data-label="Entry">${t(e.kind==='invoice'?'Sale':e.kind==='return'?'Return / Refund':'Collection')}${e.account?`<span class="row-date">${t(e.account)}</span>`:''}${e.notes?`<span class="row-date">${record(e.notes)}</span>`:''}${e.pending?`<span class="pill warning">${t('Pending Sync')}</span>`:''}</td>${amountCell('Charge / Refund',e.debit)}${amountCell('Paid / Credit',e.credit)}${amountCell('Balance',e.balance)}${editing&&!print?`<td data-label="Actions">${rowActions(e)}</td>`:''}</tr>`).join('')}</tbody></table></div>`;
@@ -43,9 +42,9 @@
  function startPayment(customerId=null,payment=null){
   if(!state.customers.length){toast('Add a customer before receiving a collection.');return;}
   ctx.payment=payment?structuredClone(payment):null;ctx.commandId=store.uuid();ctx.dirty=false;A.markDirty('due-payment',false);
-  const form=q('#duePaymentForm');form.reset();form.elements.customer_id.innerHTML=state.customers.map(c=>`<option value="${c.id}" translate="no">${html(c.name)} — ${money(c.current_due)}</option>`).join('');
-  const selected=customerId??allCustomerDues(state).find(s=>s.due>0)?.customer.id??state.customers[0].id;
-  form.elements.customer_id.value=String(store.resolveId(selected));form.elements.customer_id.disabled=!!payment;form.elements.payment_date.value=payment?.payment_date||localDate();form.elements.amount.value=payment?.amount??'';form.elements.account.value=payment?.account||'Cash';form.elements.notes.value=payment?.notes||'';
+  const form=q('#duePaymentForm');form.reset();form.elements.customer_id.innerHTML='<option value="" selected disabled>Choose a customer</option>'+state.customers.map(c=>`<option value="${c.id}" translate="no">${html(c.name)} — ${money(c.current_due)}</option>`).join('');
+  const selected=customerId??'';
+  form.elements.customer_id.value=String(store.resolveId(selected));form.elements.customer_id.disabled=!!payment;form.elements.payment_date.value=payment?.payment_date||'';form.elements.amount.value=payment?.amount??'';form.elements.account.value=payment?.account||'';form.elements.notes.value=payment?.notes||'';
   q('#duePaymentTitle').textContent=t(payment?'Edit Collection':'Receive Payment');q('#saveDuePayment').textContent=t(payment?'Save Changes':'Save Collection');q('#duePaymentError').textContent='';q('#dueStatementDialog').close();paymentPreview();i18n.apply(q('#duePaymentDialog'));q('#duePaymentDialog').showModal();form.elements.amount.focus();
  }
  async function cancelPayment(){if(ctx.busy)return;if(ctx.dirty&&!await A.confirm('Discard unsaved collection changes?'))return;q('#duePaymentDialog').close();ctx.dirty=false;A.markDirty('due-payment',false);}

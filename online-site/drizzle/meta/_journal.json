@@ -78,6 +78,13 @@
       "when": 1792728864811,
       "tag": "0010_thin_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1794787200000,
+      "tag": "0011_adjustment_edit_guard",
+      "breakpoints": true
     }
   ]
 }

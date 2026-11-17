@@ -5,6 +5,7 @@ import '../core/documents.dart';
 import '../widgets/common.dart';
 import 'record_editor.dart';
 import 'invoices.dart';
+import 'activity.dart';
 
 Future<void> deleteRecord(BuildContext c, String entity, Json record) async {
   if (!await confirm(
@@ -264,6 +265,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
               c.t('Stock adjustment history', 'মজুত সমন্বয়ের ইতিহাস'),
             ),
             children: [
+              TextButton.icon(
+                onPressed: () =>
+                    page(c, const ActivityScreen(kind: 'adjustments')),
+                icon: const Icon(Icons.history),
+                label: Text(c.t('View all adjustments', 'সব সমন্বয় দেখুন')),
+              ),
               for (final a in rows(c.w.view, 'adjustments').reversed.take(30))
                 ListTile(
                   title: Text(
@@ -279,12 +286,29 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   subtitle: Text(
                     '${a['adjust_date']} · ${enumLabel(c, text(a['type']))} · ${c.qty(a['quantity'])}',
                   ),
-                  trailing: IconButton(
-                    tooltip: c.t('Delete adjustment', 'সমন্বয় মুছুন'),
-                    onPressed: flag(a['pending'])
-                        ? null
-                        : () => deleteRecord(c, 'adjustments', a),
-                    icon: const Icon(Icons.delete_outline),
+                  trailing: Wrap(
+                    children: [
+                      IconButton(
+                        tooltip: c.t('Edit adjustment', 'সমন্বয় সম্পাদনা'),
+                        onPressed: flag(a['pending'])
+                            ? null
+                            : () => page(
+                                c,
+                                RecordEditor(
+                                  entity: 'adjustments',
+                                  initial: clone(a),
+                                ),
+                              ),
+                        icon: const Icon(Icons.edit_outlined),
+                      ),
+                      IconButton(
+                        tooltip: c.t('Delete adjustment', 'সমন্বয় মুছুন'),
+                        onPressed: flag(a['pending'])
+                            ? null
+                            : () => deleteRecord(c, 'adjustments', a),
+                        icon: const Icon(Icons.delete_outline),
+                      ),
+                    ],
                   ),
                 ),
             ],
@@ -381,21 +405,56 @@ class _CustomersScreenState extends State<CustomersScreen> {
           ),
         for (final customer in paged(list, current))
           Card(
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              onTap: () => page(c, CustomerAccount(customerId: customer['id'])),
-              leading: const CircleAvatar(child: Icon(Icons.person_outline)),
-              title: Text(
-                text(customer['name']),
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  '${customer['mobile'] ?? ''}\n${c.t('Due', 'বাকি')}: ${c.cash(customer['current_due'])}',
+            child: Column(
+              children: [
+                ListTile(
+                  contentPadding: const EdgeInsets.all(16),
+                  onTap: () =>
+                      page(c, CustomerAccount(customerId: customer['id'])),
+                  leading: const CircleAvatar(
+                    child: Icon(Icons.person_outline),
+                  ),
+                  title: Text(
+                    text(customer['name']),
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      '${customer['mobile'] ?? ''}\n${c.t('Due', 'বাকি')}: ${c.cash(customer['current_due'])}',
+                    ),
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
                 ),
-              ),
-              trailing: const Icon(Icons.chevron_right),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
+                      TextButton.icon(
+                        onPressed: flag(customer['pending'])
+                            ? null
+                            : () => page(
+                                c,
+                                RecordEditor(
+                                  entity: 'customers',
+                                  initial: clone(customer),
+                                ),
+                              ),
+                        icon: const Icon(Icons.edit_outlined),
+                        label: Text(c.t('Edit', 'সম্পাদনা')),
+                      ),
+                      TextButton.icon(
+                        onPressed: flag(customer['pending'])
+                            ? null
+                            : () => deleteRecord(c, 'customers', customer),
+                        icon: const Icon(Icons.delete_outline),
+                        label: Text(c.t('Delete', 'মুছুন')),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ListPager(

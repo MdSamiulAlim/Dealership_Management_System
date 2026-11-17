@@ -1,5 +1,5 @@
-import {allocateCents as allocate} from './money-allocation.mjs';
-export {allocateCents} from './money-allocation.mjs';
+import {allocateCents as allocate} from './money-allocation.mjs?v=percentage-half-up-2026-v1';
+export {allocateCents,percentageDiscountCents} from './money-allocation.mjs?v=percentage-half-up-2026-v1';
 const round=n=>Math.round((Number(n||0)+Number.EPSILON)*100)/100;
 /** Reports describe events on their actual dates; the live sales ledger remains
  * net of returns for stock and outstanding balances. @param {any} snapshot */

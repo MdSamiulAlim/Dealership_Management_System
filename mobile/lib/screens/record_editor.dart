@@ -161,9 +161,8 @@ class FieldSpec {
     this.kind = 'text',
     this.required = false,
     this.options = const [],
-    this.defaultValue = '',
   });
-  final String keyName, en, bn, kind, defaultValue;
+  final String keyName, en, bn, kind;
   final bool required;
   final List<String> options;
 }
@@ -178,7 +177,6 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
       'ধরন',
       kind: 'choice',
       options: ['Fish feed', 'Cattle feed', 'Poultry feed'],
-      defaultValue: 'Fish feed',
     ),
     const FieldSpec('feed_size', 'Feed size / texture', 'খাবারের আকার'),
     const FieldSpec(
@@ -192,21 +190,18 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
       'Pack weight (kg)',
       'প্যাকেটের ওজন (কেজি)',
       kind: 'positive',
-      defaultValue: '25',
     ),
     const FieldSpec(
       'default_rate',
       'Price per bag',
       'প্রতি বস্তার দর',
       kind: 'money',
-      defaultValue: '0',
     ),
     const FieldSpec(
       'low_stock_level',
       'Low stock alert (bags)',
       'কম মজুতের সতর্কতা (বস্তা)',
       kind: 'integer',
-      defaultValue: '5',
     ),
     if (edit) ...[
       const FieldSpec(
@@ -227,7 +222,6 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
         'Opening bags',
         'শুরুর বস্তা',
         kind: 'integer',
-        defaultValue: '0',
       ),
   ],
   'customers' => [
@@ -240,7 +234,6 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
         'Opening due',
         'শুরুর বাকি',
         kind: 'money',
-        defaultValue: '0',
       ),
   ],
   'payments' => [
@@ -264,7 +257,6 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
       'হিসাব',
       kind: 'choice',
       options: ['Cash', 'Bank'],
-      defaultValue: 'Cash',
     ),
     const FieldSpec('notes', 'Notes', 'নোট', kind: 'multiline'),
   ],
@@ -277,26 +269,18 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
       kind: 'product',
       required: true,
     ),
-    const FieldSpec(
-      'quantity',
-      'Bags',
-      'বস্তা',
-      kind: 'positiveInteger',
-      defaultValue: '1',
-    ),
+    const FieldSpec('quantity', 'Bags', 'বস্তা', kind: 'positiveInteger'),
     const FieldSpec(
       'bag_weight',
       'Pack weight (kg)',
       'প্যাকেটের ওজন (কেজি)',
       kind: 'positive',
-      defaultValue: '25',
     ),
     const FieldSpec(
       'rate',
       'Company rate per bag',
       'কোম্পানির প্রতি বস্তার দর',
       kind: 'money',
-      defaultValue: '0',
     ),
     const FieldSpec(
       'status',
@@ -304,7 +288,6 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
       'অবস্থা',
       kind: 'choice',
       options: ['Pending', 'Confirmed', 'Delivered'],
-      defaultValue: 'Pending',
     ),
     const FieldSpec(
       'delivery_date',
@@ -335,15 +318,8 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
       'সমন্বয়ের ধরন',
       kind: 'choice',
       options: ['Manual Add', 'Manual Minus', 'Damage', 'Loss', 'Return'],
-      defaultValue: 'Manual Add',
     ),
-    const FieldSpec(
-      'quantity',
-      'Bags',
-      'বস্তা',
-      kind: 'positiveInteger',
-      defaultValue: '1',
-    ),
+    const FieldSpec('quantity', 'Bags', 'বস্তা', kind: 'positiveInteger'),
     const FieldSpec(
       'notes',
       'Reason / notes',
@@ -373,7 +349,6 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
         'Transport Cost',
         'Other Expense',
       ],
-      defaultValue: 'Other Income',
     ),
     const FieldSpec('amount', 'Amount', 'পরিমাণ', kind: 'positive'),
     const FieldSpec(
@@ -382,14 +357,8 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
       'হিসাব',
       kind: 'choice',
       options: ['Cash', 'Bank'],
-      defaultValue: 'Cash',
     ),
-    const FieldSpec(
-      'category',
-      'Expense category',
-      'খরচের বিভাগ',
-      defaultValue: 'General',
-    ),
+    const FieldSpec('category', 'Expense category', 'খরচের বিভাগ'),
     const FieldSpec('reference', 'Reference', 'রেফারেন্স'),
     const FieldSpec('notes', 'Notes', 'নোট', kind: 'multiline'),
   ],
@@ -402,7 +371,6 @@ List<FieldSpec> specs(String entity, bool edit) => switch (entity) {
       'Large discount confirmation (%)',
       'বড় ছাড় নিশ্চিতকরণের সীমা (%)',
       kind: 'money',
-      defaultValue: '20',
     ),
   ],
   _ => [],
@@ -429,15 +397,55 @@ class _RecordEditorState extends State<RecordEditor> {
   final selected = <String, Json>{};
   bool saving = false, dirty = false;
   String? failure;
+  Json? originalTransfer;
+  bool capturedTransfer = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (capturedTransfer) return;
+    capturedTransfer = true;
+    final transfer = widget.initial?['transfer_id'];
+    if (widget.entity == 'transactions' && transfer != null) {
+      for (final row in rows(context.w.view, 'transactions')) {
+        if (row['transfer_id'] == transfer &&
+            !same(row['id'], widget.initial!['id'])) {
+          originalTransfer = clone(row);
+          break;
+        }
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    fields = specs(widget.entity, widget.initial != null);
+    var nextFields = specs(widget.entity, widget.initial != null);
+    if (widget.entity == 'transactions' && widget.initial != null) {
+      final transfer = widget.initial!['transfer_id'] != null;
+      nextFields = nextFields
+          .map(
+            (f) => f.keyName != 'type'
+                ? f
+                : FieldSpec(
+                    f.keyName,
+                    f.en,
+                    f.bn,
+                    kind: 'choice',
+                    options: f.options
+                        .where(
+                          (v) =>
+                              ['Bank Deposit', 'Bank Withdraw'].contains(v) ==
+                              transfer,
+                        )
+                        .toList(),
+                  ),
+          )
+          .toList();
+    }
+    fields = nextFields;
     for (final f in fields) {
-      final value =
-          widget.initial?[f.keyName] ??
-          widget.defaults[f.keyName] ??
-          (f.kind == 'date' ? today() : f.defaultValue);
+      final value = widget.initial?[f.keyName] ?? '';
       final controller = TextEditingController(
         text: value == null ? '' : text(value),
       );
@@ -535,11 +543,29 @@ class _RecordEditorState extends State<RecordEditor> {
         }
         p['confirmed'] = true;
       }
+      if (!mounted) return;
+      if (widget.entity == 'orders' && widget.initial != null) {
+        if (!await confirm(
+          context,
+          title: context.t(
+            'Confirm order changes',
+            'অর্ডারের পরিবর্তন নিশ্চিত করুন',
+          ),
+          message: context.t(
+            'Delivered quantities change stock and company payable.',
+            'প্রাপ্ত পরিমাণ বদলালে মজুত ও কোম্পানির পাওনা বদলাবে।',
+          ),
+        )) {
+          return;
+        }
+        p['confirmed'] = true;
+      }
       if (widget.entity == 'settings') {
         p['expected_version'] = widget.initial!['version'];
       }
       if (widget.initial != null && widget.entity != 'settings') {
         p['original'] = widget.initial;
+        if (originalTransfer != null) p['original_transfer'] = originalTransfer;
       }
       if (widget.entity == 'payments' && widget.initial != null) {
         p['customer_id'] = widget.initial!['customer_id'];
@@ -556,6 +582,7 @@ class _RecordEditorState extends State<RecordEditor> {
         )) {
           return;
         }
+        p['confirmed'] = true;
       }
       if (!mounted) return;
       await context.w.command(
@@ -586,7 +613,13 @@ class _RecordEditorState extends State<RecordEditor> {
 
   Widget field(FieldSpec f) {
     final c = controls[f.keyName]!, label = context.t(f.en, f.bn);
-    if (f.kind == 'date') return DateField(controller: c, label: label);
+    if (f.kind == 'date') {
+      return DateField(
+        controller: c,
+        label: label,
+        optional: f.keyName == 'delivery_date',
+      );
+    }
     if ([
       'money',
       'positive',
@@ -615,8 +648,7 @@ class _RecordEditorState extends State<RecordEditor> {
         items:
             (widget.entity == 'transactions' &&
                         f.keyName == 'type' &&
-                        (widget.initial != null ||
-                            widget.defaults['expense_only'] == true)
+                        widget.defaults['expense_only'] == true
                     ? f.options.where(
                         (v) => [
                           'Expense',
@@ -632,9 +664,35 @@ class _RecordEditorState extends State<RecordEditor> {
                   ),
                 )
                 .toList(),
-        onChanged: (v) {
-          if (v != null) setState(() => c.text = v);
-        },
+        onChanged:
+            widget.entity == 'transactions' &&
+                f.keyName == 'account' &&
+                [
+                  'Bank Deposit',
+                  'Bank Withdraw',
+                ].contains(controls['type']?.text)
+            ? null
+            : (v) {
+                if (v != null) {
+                  setState(() {
+                    final previous = c.text;
+                    c.text = v;
+                    if (widget.entity == 'transactions' &&
+                        f.keyName == 'type') {
+                      if (['Bank Deposit', 'Bank Withdraw'].contains(v)) {
+                        controls['account']!.text = v == 'Bank Deposit'
+                            ? 'Cash'
+                            : 'Bank';
+                      } else if ([
+                        'Bank Deposit',
+                        'Bank Withdraw',
+                      ].contains(previous)) {
+                        controls['account']!.clear();
+                      }
+                    }
+                  });
+                }
+              },
         validator: (v) =>
             v == null ? context.t('Choose an option', 'নির্বাচন করুন') : null,
       );
@@ -643,7 +701,8 @@ class _RecordEditorState extends State<RecordEditor> {
       final product = f.kind == 'product',
           record =
               selected[f.keyName] ??
-              context.w.find(product ? 'products' : 'customers', c.text);
+              context.w.find(product ? 'products' : 'customers', c.text) ??
+              (product ? context.w.find('archived_products', c.text) : null);
       return FormField<String>(
         initialValue: c.text,
         validator: (_) => c.text.isEmpty
@@ -658,9 +717,6 @@ class _RecordEditorState extends State<RecordEditor> {
                     setState(() {
                       selected[f.keyName] = row;
                       c.text = text(row['id']);
-                      if (product && controls['bag_weight'] != null) {
-                        controls['bag_weight']!.text = text(row['bag_weight']);
-                      }
                     });
                     state.didChange(c.text);
                   }

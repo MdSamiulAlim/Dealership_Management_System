@@ -19,7 +19,7 @@ The default HTTPS API is the existing Arafat Traders hosted service. To use a se
 flutter run --dart-define=API_ORIGIN=https://your-test-service.example
 ```
 
-Version 3.0.3 uses the current canonical Site origin, `https://akij-dealership-sami.subscription-cellosc.chatgpt.site`. The former origin redirects there. API requests still reject redirects rather than forwarding login credentials to another host.
+Version 3.0.4 uses the current canonical Site origin, `https://akij-dealership-sami.subscription-cellosc.chatgpt.site`. The former origin redirects there. API requests still reject redirects rather than forwarding login credentials to another host.
 
 Use your existing app username/password. Passwords are never embedded in the app or persisted as plaintext. Server cookies live in Android secure storage. Each account's encrypted replica/outbox is separate. Verified server sessions are required for normal online login; explicit password unlock allows offline work. Logout revokes the server session for that device. Lock retains encrypted pending work.
 
@@ -45,7 +45,7 @@ python3 tool/build_release.py
 
 This reads `../private-signing/signing.json` (`alias`, `password`) and `release-keystore.p12`. That folder is deliberately excluded from source ZIPs/version control. Restore the owner's original key securely before signing updates; **do not create a replacement key**. Alternatively provide `ARAFAT_KEYSTORE`, `ARAFAT_SIGNING_PASSWORD`, `ARAFAT_SIGNING_ALIAS` and run `flutter build apk --release --split-per-abi` directly. `FLUTTER_BIN` can select an installed SDK. No signing secrets are placed in Gradle files.
 
-Application ID `com.samiul.akijdealership`; version `3.0.3+9`; ABI version offsets are disabled to preserve normal update numbering. Release APKs are in `build/app/outputs/flutter-apk/`. Install the ARM64 APK on modern phones; ARMv7 is supplied for older supported devices; x86_64 is for emulators/compatible hardware.
+Application ID `com.samiul.akijdealership`; version `3.0.4+10`; ABI version offsets are disabled to preserve normal update numbering. Release APKs are in `build/app/outputs/flutter-apk/`. Install the ARM64 APK on modern phones; ARMv7 is supplied for older supported devices; x86_64 is for emulators/compatible hardware.
 
 After a successful release build, run `python3 tool/verify_release.py` with `ANDROID_HOME` pointing to the SDK and `JAVA_HOME` to JDK 17. It checks the previous release's certificate, increasing version code, ABI/package identity, archive integrity, and 16 KB ZIP/64-bit ELF alignment before copying signed artifacts and checksums into `../releases/`.
 

@@ -7,7 +7,7 @@ import {database} from './d1-adapter.mjs';
 import {executeCommand,workspaceBootstrap} from '../lib/workspace.ts';
 import * as testReplica from '../public/replica.mjs';
 import {replicaStart,replicaPage,replicaBundle,replicaChanges,revision} from '../lib/replica.ts';
-import {journalReports,allocateCents} from '../public/report-journal.mjs';
+import {journalReports,allocateCents,percentageDiscountCents} from '../public/report-journal.mjs';
 import {resetWorkspace as resetServer} from '../lib/workspace-access.ts';
 
 // Each browser context is disposable; the IndexedDB adapter is shared across
@@ -19,13 +19,13 @@ async function replicaReply(db,user,path){
 }
 function browser(storage,fetch,storageFailure=false,hooks={}){
  let source=readFileSync(new URL('../public/offline-store.js',import.meta.url),'utf8');
- source=source.replace('let journalReports=null,shares=null','let journalReports=testJournal,shares=testShares').replace("await import('/replica.mjs?v=sync-ui-fixes-2026-v1')",'testReplica');
+ source=source.replace('let journalReports=null,shares=null,percentageDiscount=null','let journalReports=testJournal,shares=testShares,percentageDiscount=testPercentage').replace("await import('/replica.mjs?v=sync-ui-fixes-2026-v1')",'testReplica');
  const start=source.indexOf('  async function read('),end=source.indexOf('  async function derive(',start);
  source=source.slice(0,start)+`  async function read(name=VAULT){return storageRead(name);}\n  async function write(value,expected,name=VAULT){return storageWrite(value,expected,name);}\n`+source.slice(end);
  // Supply only IndexedDB account-selection I/O for the VM harness.
  const selectStart=source.indexOf('  async function selectAccountVault('),selectEnd=source.indexOf('  async function signIn(',selectStart);
  source=source.slice(0,selectStart)+`  async function selectAccountVault(owner){const current=await read();return current?.username===owner?current:null;}\n`+source.slice(selectEnd);
- const c=vm.createContext({testJournal:journalReports,testShares:allocateCents,testReplica,crypto:webcrypto,structuredClone,Intl,fetch,AbortController,CustomEvent,Event,TextEncoder,TextDecoder,btoa,atob,clearTimeout,setTimeout,setInterval(){},localStorage:{getItem(){return null},setItem(){}},navigator:{onLine:true,locks:hooks.locks},window:{addEventListener(){},dispatchEvent(){}},
+ const c=vm.createContext({testJournal:journalReports,testShares:allocateCents,testPercentage:percentageDiscountCents,testReplica,crypto:webcrypto,structuredClone,Intl,fetch,AbortController,CustomEvent,Event,TextEncoder,TextDecoder,btoa,atob,clearTimeout,setTimeout,setInterval(){},localStorage:{getItem(){return null},setItem(){}},navigator:{onLine:true,locks:hooks.locks},window:{addEventListener(){},dispatchEvent(){}},
   storageRead:async name=>structuredClone(storage.get(name)||null),
   storageWrite:async(value,expected,name)=>{if(storageFailure)throw Error('Fixture storage unavailable');await hooks.beforeWrite?.(value,name);assert.equal(storage.get(name)?.revision||0,expected);storage.set(name,structuredClone(value));},
  });
@@ -229,7 +229,7 @@ for(const vault of [false,true])for(const nativeLocks of [false,true])test(`rese
 for(const vault of [false,true])test(`an earlier pending payment blocks ${vault?'vault':'online'} reset and remains after reload`,async()=>{
  const db=database(),storage=new Map(),user={username:'FixtureOwner',role:'admin'};let resets=0;
  try{
-  const fetch=async(path,options)=>{if(path==='/api/reset-workspace'){resets++;throw Error('Reset must not be sent');}const reply=await replicaReply(db,user,path);if(reply)return reply;if(path==='/api/commands')throw Error('Fixture offline');throw Error(path);};
+  const fetch=async(path)=>{if(path==='/api/reset-workspace'){resets++;throw Error('Reset must not be sent');}const reply=await replicaReply(db,user,path);if(reply)return reply;if(path==='/api/commands')throw Error('Fixture offline');throw Error(path);};
   let store=browser(storage,fetch),base=await store.request('/api/bootstrap');
   if(vault){await encryptedFixture(storage,'current',{base,queue:[],ids:{}},user.username,'reset-test-password');store=browser(storage,fetch);await store.unlock(user.username,'reset-test-password');}
   const saving=store.request('/api/payments',{method:'POST',body:JSON.stringify({customer_id:base.customers[0].id,payment_date:'2026-10-30',amount:100,account:'Cash'})});
@@ -280,4 +280,46 @@ test('reset keeps its Save guard until the encrypted storage commit completes',a
   try{await assert.rejects(promptly(store.request('/api/payments',{method:'POST',body:JSON.stringify({customer_id:base.customers[0].id,payment_date:'2026-10-30',amount:100,account:'Cash'})})),/Reset is in progress/);}finally{gate.release();}
   await resetting;assert.equal(store.project().workspace_epoch,1);assert.equal(store.status().resetting,false);
  }finally{gate.release();await resetting?.catch(()=>{});db.connection.close();}
+});
+
+
+test('transfer edit survives a lost response and reload without unbalancing accounts',async()=>{
+ const db=database(),storage=new Map(),user={username:'FixtureOwner',role:'admin'};let lose=true;
+ try{
+  await workspaceBootstrap(db);
+  const command=(method,path,payload)=>({id:crypto.randomUUID(),method,path,payload});
+  await executeCommand(db,command('POST','/api/transactions',{txn_date:'2026-11-16',type:'Other Income',amount:1000,account:'Cash'}));
+  await executeCommand(db,command('POST','/api/transactions',{txn_date:'2026-11-16',type:'Bank Deposit',amount:100,account:'Cash'}));
+  const fetch=async(path,options)=>{
+   const reply=await replicaReply(db,user,path);if(reply)return reply;
+   if(path==='/api/bootstrap')return Response.json({...await workspaceBootstrap(db),user});
+   const op=JSON.parse(options.body),result=await executeCommand(db,op);
+   if(lose){lose=false;throw Error('Fixture lost edit response');}
+   return Response.json({sync_protocol:2,sync_revision:await revision(db),command_result:result});
+  };
+  let store=browser(storage,fetch),base=await store.request('/api/bootstrap');
+  const original=base.transactions.find(t=>t.transfer_id&&t.account==='Cash'),partner=base.transactions.find(t=>t.transfer_id===original.transfer_id&&t.id!==original.id);
+  const projected=await store.request(`/api/transactions/${original.id}`,{method:'PATCH',body:JSON.stringify({...original,amount:250,original,original_transfer:partner,confirmed:true})});
+  assert.equal(projected.dashboard.cash_balance,750);assert.equal(projected.dashboard.bank_balance,250);assert.equal(store.status().pending,1);
+  store=browser(storage,fetch);const reloaded=await store.request('/api/bootstrap');
+  assert.equal(store.status().pending,0);assert.equal(reloaded.dashboard.cash_balance,750);assert.equal(reloaded.dashboard.bank_balance,250);
+  assert.ok((await workspaceBootstrap(db)).transactions.filter(t=>t.transfer_id).every(t=>t.amount===250));
+ }finally{db.connection.close();}
+});
+
+test('offline adjustment edits reject invalid stock changes before enqueue and project the replacement effect',async()=>{
+ const db=database(),storage=new Map(),user={username:'FixtureOwner',role:'admin'};
+ try{
+  let base=await workspaceBootstrap(db);const product=base.products[0];
+  db.connection.prepare('UPDATE products SET opening_stock=20 WHERE id=?').run(product.id);
+  await executeCommand(db,{id:crypto.randomUUID(),method:'POST',path:'/api/adjustments',payload:{product_id:product.id,adjust_date:'2026-11-16',quantity:10,type:'Manual Add',notes:'Count',confirmed:true}});
+  base={...await workspaceBootstrap(db),user};
+  await encryptedFixture(storage,'current',{base,queue:[],ids:{}},user.username,'fixture-only-password');
+  const store=browser(storage,async()=>{throw Error('Fixture offline');});await store.unlock(user.username,'fixture-only-password');
+  const original=base.adjustments[0],path=`/api/adjustments/${original.id}`;
+  for(const changes of [{quantity:1.5},{quantity:35,type:'Manual Minus'}])await assert.rejects(store.request(path,{method:'PATCH',body:JSON.stringify({...original,...changes,original,confirmed:true})}));
+  assert.equal(store.status().pending,0);
+  const projected=await store.request(path,{method:'PATCH',body:JSON.stringify({...original,quantity:5,type:'Manual Minus',original,confirmed:true})});
+  assert.equal(projected.products.find(p=>p.id===product.id).current_stock,15);assert.equal(store.status().pending,1);
+ }finally{db.connection.close();}
 });

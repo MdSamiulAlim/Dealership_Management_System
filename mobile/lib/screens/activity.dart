@@ -24,18 +24,21 @@ class _ActivityScreenState extends State<ActivityScreen> {
     final en = switch (widget.kind) {
       'orders' => 'Company orders',
       'payments' => 'Payments',
+      'adjustments' => 'Stock adjustments',
       'expenses' => 'Expenses',
       _ => 'Money & transactions',
     };
     final bn = switch (widget.kind) {
       'orders' => 'কোম্পানির অর্ডার',
       'payments' => 'আদায়',
+      'adjustments' => 'মজুত সমন্বয়',
       'expenses' => 'খরচ',
       _ => 'অর্থ ও লেনদেন',
     };
     final dateKey = switch (entity) {
       'orders' => 'order_date',
       'payments' => 'payment_date',
+      'adjustments' => 'adjust_date',
       _ => 'txn_date',
     };
     final seen = <String>{};
@@ -262,7 +265,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    entity == 'orders'
+                    entity == 'orders' || entity == 'adjustments'
                         ? text(row['product_name'])
                         : entity == 'payments'
                         ? text(row['customer_name'])
@@ -288,6 +291,16 @@ class _ActivityScreenState extends State<ActivityScreen> {
                         c.t('Challan', 'চালান'),
                         text(row['invoice_no']),
                       ),
+                  ] else if (entity == 'adjustments') ...[
+                    ValueRow(
+                      c.t('Type', 'ধরন'),
+                      enumLabel(c, text(row['type'])),
+                    ),
+                    ValueRow(
+                      c.t('Bags', 'বস্তা'),
+                      c.qty(row['quantity']),
+                      bold: true,
+                    ),
                   ] else ...[
                     ValueRow(
                       c.t('Amount', 'পরিমাণ'),
@@ -316,25 +329,22 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     Chip(label: Text(c.t('Pending Sync', 'Sync অপেক্ষমাণ'))),
                   Row(
                     children: [
-                      if (entity == 'payments' ||
-                          (entity == 'transactions' &&
-                              expenseTypes.contains(row['type'])))
-                        TextButton.icon(
-                          onPressed: flag(row['pending'])
-                              ? null
-                              : () => page(
-                                  c,
-                                  RecordEditor(
-                                    entity: entity,
-                                    initial: clone(row),
-                                    defaults: widget.kind == 'expenses'
-                                        ? {'expense_only': true}
-                                        : {},
-                                  ),
+                      TextButton.icon(
+                        onPressed: flag(row['pending'])
+                            ? null
+                            : () => page(
+                                c,
+                                RecordEditor(
+                                  entity: entity,
+                                  initial: clone(row),
+                                  defaults: widget.kind == 'expenses'
+                                      ? {'expense_only': true}
+                                      : {},
                                 ),
-                          icon: const Icon(Icons.edit_outlined),
-                          label: Text(c.t('Edit', 'সম্পাদনা')),
-                        ),
+                              ),
+                        icon: const Icon(Icons.edit_outlined),
+                        label: Text(c.t('Edit', 'সম্পাদনা')),
+                      ),
                       const Spacer(),
                       IconButton(
                         tooltip: c.t('Delete record', 'তথ্য মুছুন'),

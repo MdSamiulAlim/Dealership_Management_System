@@ -4,7 +4,7 @@ import markup from "../lib/interface.html?raw";
 export default function Dashboard() {
   useEffect(() => {
     if (document.getElementById("dealership-script") || document.getElementById("workspace-script-0")) return;
-    const scripts = ["/i18n-catalog.js?v=reset-save-2026-v1", "/i18n.js?v=sync-ui-fixes-2026-v1", "/offline-store.js?v=reset-save-2026-v1", "/dealership.js?v=sync-ui-fixes-2026-v1", "/advanced.js?v=reset-save-2026-v1", "/usability.js?v=sync-ui-fixes-2026-v1", "/dues.js?v=sync-ui-fixes-2026-v1"];
+    const scripts = ["/i18n-catalog.js?v=blank-entry-2026-v1", "/i18n.js?v=sync-ui-fixes-2026-v1", "/offline-store.js?v=percentage-half-up-2026-v1", "/dealership.js?v=percentage-half-up-2026-v1", "/advanced.js?v=blank-entry-2026-v1", "/record-editor.js?v=record-actions-2026-v1", "/usability.js?v=sync-ui-fixes-2026-v1", "/dues.js?v=percentage-half-up-2026-v1"];
     const load = (index: number) => {
       if (index >= scripts.length) return;
       const script = document.createElement("script");

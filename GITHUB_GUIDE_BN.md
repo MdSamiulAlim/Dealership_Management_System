@@ -4,7 +4,7 @@
 
 এই directory-তে Flutter mobile (`mobile/`), web/backend (`online-site/`),
 Python local app, assets, tests, dependency lockfiles, database migrations এবং
-build/hosting instructions আছে। Flutter 3.0.3+9 ও live web Version 53-এর source
+build/hosting instructions আছে। Flutter 3.0.4+10 ও live web Version 56-এর source
 থেকে কপি করা হয়েছে। মূল project বা live app পরিবর্তন করা হয়নি।
 
 ## Push

@@ -7,6 +7,26 @@ import 'record_editor.dart';
 
 bool hasReturns(Json invoice) =>
     rows(invoice, 'items').any((i) => number(i['returned_quantity']) > 0);
+Future<void> deleteInvoice(BuildContext c, Json invoice) async {
+  if (!await confirm(
+        c,
+        title: c.t('Delete / cancel invoice?', 'ইনভয়েস মুছবেন / বাতিল করবেন?'),
+        message:
+            '${invoice['invoice_no']}\n${invoice['customer_name']}\n${c.t('Stock and financial effects will be reversed; history remains.', 'মজুত ও হিসাবের প্রভাব উল্টানো হবে; ইতিহাস থাকবে।')}',
+        destructive: true,
+      ) ||
+      !c.mounted) {
+    return;
+  }
+  await runAction(
+    c,
+    () => c.w.command('DELETE', '/api/invoices/${invoice['id']}', {
+      'expected_version': invoice['version'],
+      'confirmed': true,
+    }),
+  );
+}
+
 String invoiceStatus(BuildContext c, Json invoice) =>
     invoice['status'] == 'void'
     ? c.t('Cancelled', 'বাতিল')
@@ -270,6 +290,33 @@ class _SalesScreenState extends State<SalesScreen> {
                       c.t('Paid / Due', 'পরিশোধ / বাকি'),
                       '${c.cash(invoice['net_paid'])} / ${c.cash(invoice['due_amount'])}',
                     ),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        TextButton.icon(
+                          onPressed:
+                              invoice['status'] != 'active' ||
+                                  hasReturns(invoice) ||
+                                  flag(invoice['pending'])
+                              ? null
+                              : () => page(
+                                  c,
+                                  SaleEditor(invoice: clone(invoice)),
+                                ),
+                          icon: const Icon(Icons.edit_outlined),
+                          label: Text(c.t('Edit', 'সম্পাদনা')),
+                        ),
+                        TextButton.icon(
+                          onPressed:
+                              invoice['status'] != 'active' ||
+                                  flag(invoice['pending'])
+                              ? null
+                              : () => deleteInvoice(c, invoice),
+                          icon: const Icon(Icons.delete_outline),
+                          label: Text(c.t('Delete', 'মুছুন')),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -286,9 +333,9 @@ class _SalesScreenState extends State<SalesScreen> {
 }
 
 class _SaleLine {
-  _SaleLine({this.product, int quantity = 1, double rate = 0})
-    : quantity = TextEditingController(text: '$quantity'),
-      rate = TextEditingController(text: rate.toString());
+  _SaleLine({this.product, int? quantity, double? rate})
+    : quantity = TextEditingController(text: quantity?.toString() ?? ''),
+      rate = TextEditingController(text: rate?.toString() ?? '');
   Json? product;
   final TextEditingController quantity, rate;
   void dispose() {
@@ -317,7 +364,7 @@ class _SaleEditorState extends State<SaleEditor> {
       paid = TextEditingController();
   final lines = <_SaleLine>[];
   dynamic customerId;
-  String account = 'Cash', discountType = 'amount';
+  String account = '', discountType = '';
   bool saving = false, dirty = false, initialized = false;
   String? error;
   @override
@@ -327,16 +374,17 @@ class _SaleEditorState extends State<SaleEditor> {
     initialized = true;
     final i = widget.invoice;
     id = text(i?['id'] ?? context.w.uuid.v4());
-    date.text = text(i?['sale_date'] ?? today());
+    date.text = text(i?['sale_date']);
     memo.text = text(i?['invoice_no']);
     customerId = i?['customer_id'];
     name.text = text(i?['customer_name']);
     mobile.text = text(i?['customer_mobile']);
     address.text = text(i?['customer_address']);
     notes.text = text(i?['notes']);
-    discount.text = text(i?['discount'] ?? 0);
-    paid.text = text(i?['paid_amount'] ?? 0);
-    account = text(i?['account'] ?? 'Cash');
+    discount.text = text(i?['discount']);
+    paid.text = text(i?['paid_amount']);
+    account = text(i?['account']);
+    discountType = i == null ? '' : 'amount';
     if (i != null) {
       for (final row in rows(i, 'items')) {
         lines.add(
@@ -387,7 +435,9 @@ class _SaleEditorState extends State<SaleEditor> {
           (line) => {
             'product_id': line.product?['id'],
             'quantity': number(line.quantity.text),
-            'rate': number(line.rate.text),
+            'rate': line.rate.text.trim().isEmpty
+                ? null
+                : number(line.rate.text),
           },
         )
         .toList(),
@@ -523,7 +573,6 @@ class _SaleEditorState extends State<SaleEditor> {
                   if (row != null) {
                     setState(() {
                       line.product = row;
-                      line.rate.text = text(row['default_rate']);
                       dirty = true;
                       field.didChange(row['id']);
                     });
@@ -714,20 +763,27 @@ class _SaleEditorState extends State<SaleEditor> {
                 label: Text(c.t('Add another product', 'আরেকটি পণ্য যোগ করুন')),
               ),
               const SizedBox(height: 18),
-              SegmentedButton<String>(
-                segments: [
-                  ButtonSegment(
+              DropdownButtonFormField<String>(
+                initialValue: discountType.isEmpty ? null : discountType,
+                decoration: InputDecoration(
+                  labelText: c.t('Discount type', 'ছাড়ের ধরন'),
+                ),
+                items: [
+                  DropdownMenuItem(
                     value: 'amount',
-                    label: Text(c.t('Discount amount', 'ছাড়ের পরিমাণ')),
+                    child: Text(c.t('Discount amount', 'ছাড়ের পরিমাণ')),
                   ),
-                  ButtonSegment(
+                  DropdownMenuItem(
                     value: 'percent',
-                    label: Text(c.t('Discount %', 'ছাড় %')),
+                    child: Text(c.t('Discount %', 'ছাড় %')),
                   ),
                 ],
-                selected: {discountType},
-                onSelectionChanged: (v) => setState(() {
-                  discountType = v.first;
+                validator: (_) =>
+                    number(discount.text) > 0 && discountType.isEmpty
+                    ? c.t('Choose an option', 'নির্বাচন করুন')
+                    : null,
+                onChanged: (v) => setState(() {
+                  discountType = v ?? '';
                   dirty = true;
                 }),
               ),
@@ -735,6 +791,7 @@ class _SaleEditorState extends State<SaleEditor> {
               NumberField(
                 controller: discount,
                 label: c.t('Discount', 'ছাড়'),
+                required: false,
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 16),
@@ -765,20 +822,28 @@ class _SaleEditorState extends State<SaleEditor> {
                   ),
                 ],
               ),
-              SegmentedButton<String>(
-                segments: [
-                  ButtonSegment(
+              DropdownButtonFormField<String>(
+                initialValue: account.isEmpty ? null : account,
+                key: const ValueKey('sale-account'),
+                decoration: InputDecoration(labelText: c.t('Account', 'হিসাব')),
+                items: [
+                  DropdownMenuItem(
                     value: 'Cash',
-                    label: Text(c.t('Cash', 'ক্যাশ')),
+                    child: Text(c.t('Cash', 'ক্যাশ')),
                   ),
-                  ButtonSegment(
+                  DropdownMenuItem(
                     value: 'Bank',
-                    label: Text(c.t('Bank', 'ব্যাংক')),
+                    child: Text(c.t('Bank', 'ব্যাংক')),
                   ),
                 ],
-                selected: {account},
-                onSelectionChanged: (v) => setState(() {
-                  account = v.first;
+                validator: (_) => account.isEmpty
+                    ? c.t(
+                        'Choose Cash or Bank.',
+                        'ক্যাশ অথবা ব্যাংক নির্বাচন করুন।',
+                      )
+                    : null,
+                onChanged: (v) => setState(() {
+                  account = v ?? '';
                   dirty = true;
                 }),
               ),
@@ -1172,16 +1237,17 @@ class ReturnEditor extends StatefulWidget {
 
 class _ReturnEditorState extends State<ReturnEditor> {
   final form = GlobalKey<FormState>(),
-      date = TextEditingController(text: today()),
+      date = TextEditingController(),
       reason = TextEditingController();
   final quantities = <String, TextEditingController>{};
-  bool restock = true, saving = false, dirty = false;
+  bool? restock;
+  bool saving = false, dirty = false;
   String? error;
   @override
   void initState() {
     super.initState();
     for (final item in rows(widget.invoice, 'items')) {
-      quantities[text(item['id'])] = TextEditingController(text: '0');
+      quantities[text(item['id'])] = TextEditingController();
     }
   }
 
@@ -1282,6 +1348,7 @@ class _ReturnEditorState extends State<ReturnEditor> {
                     NumberField(
                       controller: quantities[text(item['id'])]!,
                       integer: true,
+                      required: false,
                       maximum:
                           number(item['quantity']) -
                           number(item['returned_quantity']),
@@ -1298,17 +1365,21 @@ class _ReturnEditorState extends State<ReturnEditor> {
                   ? c.t('Enter a reason', 'কারণ লিখুন')
                   : null,
             ),
-            CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                c.t(
+            DropdownButtonFormField<bool>(
+              decoration: InputDecoration(
+                labelText: c.t(
                   'Return stock to available inventory',
                   'ফেরত পণ্য মজুতে যোগ করুন',
                 ),
               ),
-              value: restock,
+              items: [
+                DropdownMenuItem(value: true, child: Text(c.t('Yes', 'হ্যাঁ'))),
+                DropdownMenuItem(value: false, child: Text(c.t('No', 'না'))),
+              ],
+              validator: (v) =>
+                  v == null ? c.t('Choose an option', 'নির্বাচন করুন') : null,
               onChanged: (v) => setState(() {
-                restock = v!;
+                restock = v;
                 dirty = true;
               }),
             ),

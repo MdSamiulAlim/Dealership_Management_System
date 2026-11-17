@@ -35,6 +35,16 @@ String errorMessage(BuildContext context, Object error) {
       ? text(error.message)
       : 'Could not complete this action. Please try again.';
   const translations = {
+    'Confirm the stock change first.': 'আগে মজুত পরিবর্তন নিশ্চিত করুন।',
+    'Enter a stock adjustment reason.': 'মজুত সমন্বয়ের কারণ লিখুন।',
+    'Reload the complete transfer before editing.':
+        'সম্পাদনার আগে স্থানান্তরের সম্পূর্ণ তথ্য Sync করুন।',
+    'Transfer changed on another device. Refresh first.':
+        'অন্য ডিভাইসে স্থানান্তরের তথ্য বদলেছে। আগে Sync করুন।',
+    'Confirm the transfer edit. Keep it as Cash to Bank or Bank to Cash.':
+        'স্থানান্তর সম্পাদনা নিশ্চিত করুন। ক্যাশ থেকে ব্যাংক বা ব্যাংক থেকে ক্যাশ রাখুন।',
+    'Create a new transfer instead of changing a single transaction into a transfer.':
+        'একটি লেনদেনকে স্থানান্তর না বানিয়ে নতুন স্থানান্তর তৈরি করুন।',
     'Enter a valid amount or quantity.': 'সঠিক টাকা বা পরিমাণ দিন।',
     'Invoice subtotal cannot exceed 1,000,000,000,000.':
         'ইনভয়েসের মোট ১,০০০,০০০,০০০,০০০ টাকার বেশি হতে পারবে না।',
@@ -322,9 +332,15 @@ class SearchField extends StatelessWidget {
 }
 
 class DateField extends StatelessWidget {
-  const DateField({super.key, required this.controller, required this.label});
+  const DateField({
+    super.key,
+    required this.controller,
+    required this.label,
+    this.optional = false,
+  });
   final TextEditingController controller;
   final String label;
+  final bool optional;
   @override
   Widget build(BuildContext context) => TextFormField(
     controller: controller,
@@ -344,7 +360,9 @@ class DateField extends StatelessWidget {
         controller.text = DateFormat('yyyy-MM-dd', 'en').format(picked);
       }
     },
-    validator: (value) => value == null || DateTime.tryParse(value) == null
+    validator: (value) => optional && (value == null || value.isEmpty)
+        ? null
+        : value == null || DateTime.tryParse(value) == null
         ? context.t('Choose a date', 'তারিখ দিন')
         : null,
   );

@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-11-17T07:43:44.868326+00:00",
+  "percentage_case": {
+    "subtotal": 50,
+    "percent": 0.57,
+    "discount": 0.29,
+    "total": 49.71
+  },
+  "web_tests": 163,
+  "mobile_tests": 159,
+  "strict_lint": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "typescript": "passed",
+  "flutter_analysis": "no issues",
+  "production_audit": 0,
+  "full_dependency_audit": 0,
+  "production_build": "passed",
+  "browser_invoice_edit_and_save": "passed",
+  "built_worker_http_security_invoice_pdf": "passed",
+  "http_startup_polls": 42,
+  "http_proxy_events": 0,
+  "http_transport_events": 0,
+  "browser_first_attempt": "Chrome debugging endpoint not ready; original ECONNREFUSED log retained in /tmp. Retry and final updated invoice-editor scenario passed without browser errors.",
+  "historical_invoices": "Not rewritten: original percentage is not stored. Re-enter percentage and save to correct an editable old invoice.",
+  "apk_built": false
+}

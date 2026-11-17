@@ -1,7 +1,7 @@
 name: arafat_traders
 description: Dedicated Flutter dealership workspace with secure offline sync.
 publish_to: none
-version: 3.0.3+9
+version: 3.0.4+10
 environment:
   sdk: '>=3.8.0 <4.0.0'
 dependencies:

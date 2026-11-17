@@ -12,8 +12,3 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
-
-# Keep the Gradle wrapper in this complete source repository.
-!gradlew
-!gradlew.bat
-!gradle/wrapper/gradle-wrapper.jar
